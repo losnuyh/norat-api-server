@@ -1,9 +1,4 @@
-from dotenv import load_dotenv
-
 from dataclasses import dataclass
-
-
-load_dotenv()
 
 
 @dataclass(frozen=True, slots=True)
@@ -24,5 +19,3 @@ class ApplicationConfigScheme:
     COOL_SMS_SEND_PHONE_NUMBER: str
 
     JWT_SIGNING_PRIVATE_KEY: str
-
-
