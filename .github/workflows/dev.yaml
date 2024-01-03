@@ -30,7 +30,7 @@ jobs:
 
       - name: Build
         run: |
-          make env=$env.ENV api_function_zip
+          make env="${{ env.ENV }}" api_function_zip
 
       - name: Deploy function
         run: |
