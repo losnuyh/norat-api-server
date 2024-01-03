@@ -19,6 +19,6 @@ api_function_zip:
 	chmod +X ./api_lambda/lambda_api_function.py
 	rm api_lambda.zip || true
 	ls -A .
-	cd api_lambda && zip -r ../api_lambda.zip ./*
+	cd api_lambda && zip -r ../api_lambda.zip ./
 	ls api_lambda
 	rm -rf api_lambda || true
