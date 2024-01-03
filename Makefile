@@ -8,7 +8,7 @@ api_function_zip:
 	rm requirements-lambda.txt
 	rm -rf api_lambda || true
 	pip install boto3
-	python generate_env_file.py
+	python generate_env_file.py --env=$(env)
 	mkdir api_lambda
 	cp .env ./api_lambda
 	cp lambda_api_function.py ./api_lambda/
