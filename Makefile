@@ -7,6 +7,7 @@ api_function_zip:
 	pip install --platform manylinux_2_17_aarch64 --implementation cp --only-binary=:all: -r requirements-lambda.txt --target ./_api_package --upgrade
 	rm requirements-lambda.txt
 	rm -rf api_lambda || true
+	pip install boto3
 	python generate_env_file.py
 	mkdir api_lambda
 	cp .env ./api_lambda
