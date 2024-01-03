@@ -10,6 +10,7 @@ api_function_zip:
 	pip install boto3
 	python generate_env_file.py --env=$(env)
 	mkdir api_lambda
+	ls -A .
 	cp .env ./api_lambda
 	cp lambda_api_function.py ./api_lambda/
 	cp -R ./_api_package/* ./api_lambda
@@ -17,5 +18,7 @@ api_function_zip:
 	cp -R ./application ./api_lambda
 	chmod +X ./api_lambda/lambda_api_function.py
 	rm api_lambda.zip || true
+	ls -A .
 	cd api_lambda && zip -r ../api_lambda.zip ./*
+	ls api_lambda
 	rm -rf api_lambda || true
