@@ -1,8 +1,7 @@
-from .authenticator import AuthenticationPhone
-from .token import AdminAuthToken, AuthToken, PhoneToken
+from .authentication_phone import AuthenticationPhone
+from .token import AuthToken, PhoneToken
 
 __all__ = [
-    "AdminAuthToken",
     "AuthToken",
     "PhoneToken",
     "AuthenticationPhone",

@@ -2,11 +2,6 @@ from dataclasses import dataclass
 
 
 @dataclass(kw_only=True)
-class AdminAuthToken:
-    access_token: str
-
-
-@dataclass(kw_only=True)
 class PhoneToken:
     access_token: str
 
