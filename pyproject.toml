@@ -23,6 +23,7 @@ pyjwt = "^2.8.0"
 aiohttp = {extras = ["speedups"], version = "^3.9.1"}
 aiomysql = "^0.2.0"
 greenlet = "^3.0.3"
+bcrypt = "^4.1.2"
 
 [tool.poetry.group.manage.dependencies]
 alembic = "^1.13.0"
