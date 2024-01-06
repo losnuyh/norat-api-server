@@ -6,7 +6,7 @@ from application.infra.unit_of_work.sqlalchemy import UnitOfWork
 
 class CodeSenderOutputPort(ABC):
     @abstractmethod
-    async def send_code(self, *, authentication_phone: AuthenticationPhone):
+    async def send_code(self, *, authentication_phone: AuthenticationPhone) -> bool:
         ...
 
 

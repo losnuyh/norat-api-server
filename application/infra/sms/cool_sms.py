@@ -1,12 +1,12 @@
-import logging
 import hashlib
 import hmac
+import logging
 import uuid
 from datetime import datetime, timezone
 
 import aiohttp
 
-from . import SMSSender
+from . import SendFail, SMSSender
 
 
 class CoolSMSSender(SMSSender):
@@ -59,3 +59,4 @@ class CoolSMSSender(SMSSender):
                 if response.status >= 400:
                     json_body = await response.json()
                     logging.warning(json_body)
+                    raise SendFail(f"send message fail, {json_body}")

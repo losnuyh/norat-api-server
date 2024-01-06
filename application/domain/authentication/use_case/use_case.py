@@ -20,10 +20,13 @@ class AuthenticationUseCase(AuthenticationInputPort):
         )
         async with self.auth_store as uow:
             await uow.save_auth_phone(authentication_phone=authentication_phone)
-            await self.code_sender.send_code(
+            is_success = await self.code_sender.send_code(
                 authentication_phone=authentication_phone,
-            )  # TODO: send 실패한 경우 commit하지 않을 할 수 있게 개선
-            await uow.commit()
+            )
+            if is_success:
+                await uow.commit()
+            else:
+                await uow.rollback()
 
     async def get_phone_verification_token(self, *, phone: str, code: str) -> PhoneToken:
         async with self.auth_store(read_only=True) as uow:
