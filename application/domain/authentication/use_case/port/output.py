@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 from application.domain.authentication.model import AuthenticationPhone
+from application.infra.unit_of_work.sqlalchemy import UnitOfWork
 
 
 class CodeSenderOutputPort(ABC):
@@ -9,7 +10,7 @@ class CodeSenderOutputPort(ABC):
         ...
 
 
-class AuthenticationStoreOutputPort(ABC):
+class AuthenticationStoreOutputPort(UnitOfWork, ABC):
     @abstractmethod
     async def save_auth_phone(self, *, authentication_phone: AuthenticationPhone):
         ...

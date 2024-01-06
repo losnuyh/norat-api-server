@@ -8,7 +8,6 @@ from application.jwt.token_type import PhoneAuthenticationTokenPayload
 from .token import PhoneToken
 
 
-
 @dataclass
 class AuthenticationPhone:
     code: str
@@ -20,7 +19,7 @@ class AuthenticationPhone:
 
     def get_token(self, *, code: str) -> PhoneToken:
         if not self._check_token(code=code):
-            raise AuthenticationFail("code is not correct")
+            raise AuthenticationFail("code is not correct")  # TODO: 에외 처리 필요, 에러처리 없어 500 에러 떨어지는 중임
         now = datetime.now(tz=timezone.utc)
         payload = PhoneAuthenticationTokenPayload(
             phone=self.phone,

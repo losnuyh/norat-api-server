@@ -18,12 +18,17 @@ class AuthenticationUseCase(AuthenticationInputPort):
             code="".join(choices("0123456789", k=5)),
             expired_at=datetime.now(tz=timezone.utc) + timedelta(minutes=10),
         )
-        await self.auth_store.save_auth_phone(authentication_phone=authentication_phone)
-        await self.code_sender.send_code(authentication_phone=authentication_phone)
+        async with self.auth_store as uow:
+            await uow.save_auth_phone(authentication_phone=authentication_phone)
+            await self.code_sender.send_code(
+                authentication_phone=authentication_phone,
+            )  # TODO: send 실패한 경우 commit하지 않을 할 수 있게 개선
+            await uow.commit()
 
     async def get_phone_verification_token(self, *, phone: str, code: str) -> PhoneToken:
-        authentication_phone = await self.auth_store.get_authentication_phone(phone=phone)
-        if authentication_phone is None:
-            raise AuthenticationFail("authentication is not in progress")
-        token = authentication_phone.get_token(code=code)
-        return token
+        async with self.auth_store(read_only=True) as uow:
+            authentication_phone = await uow.get_authentication_phone(phone=phone)
+            if authentication_phone is None:
+                raise AuthenticationFail("authentication is not in progress")
+            token = authentication_phone.get_token(code=code)
+            return token
