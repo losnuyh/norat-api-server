@@ -10,7 +10,7 @@ class UserUseCase(UserInputPort):
     def __init__(self, *, user_store: UserStoreOutputPort):
         self.user_store = user_store
 
-    async def create_user(self, *, account: str, password: str, birth: date) -> User:
+    async def create_user(self, *, account: str, birth: date) -> User:
         async with self.user_store as uow:
             if await uow.get_user_by_account(account=account):
                 raise AccountIsDuplicated(f"account: {account} is duplicated")
