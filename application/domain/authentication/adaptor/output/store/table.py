@@ -30,3 +30,19 @@ class AuthPhoneTable(Base):
         nullable=False,
         kw_only=True,
     )
+
+
+class PasswordAuthenticatorTable(Base):
+    __tablename__ = "password_authenticator"
+
+    id: Mapped[int] = mapped_column(primary_key=True, kw_only=True)
+    user_account: Mapped[int] = mapped_column(kw_only=True, index=True, unique=True)
+    hashed_password: Mapped[str]= mapped_column(
+        String(128),
+        nullable=False,
+        kw_only=True,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        nullable=False,
+        kw_only=True,
+    )
