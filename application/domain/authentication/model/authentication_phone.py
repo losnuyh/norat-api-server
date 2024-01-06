@@ -19,7 +19,7 @@ class AuthenticationPhone:
 
     def get_token(self, *, code: str) -> PhoneToken:
         if not self._check_token(code=code):
-            raise AuthenticationFail("code is not correct")  # TODO: 에외 처리 필요, 에러처리 없어 500 에러 떨어지는 중임
+            raise AuthenticationFail("code is not correct")
         now = datetime.now(tz=timezone.utc)
         payload = PhoneAuthenticationTokenPayload(
             phone=self.phone,

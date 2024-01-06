@@ -1,15 +1,26 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+from starlette import status
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from application.domain.authentication.adaptor.input.http import AuthenticationHttpInputAdaptor, authentication_router
 from application.domain.authentication.adaptor.output.sms_sender import SMSCodeSenderOutputAdaptor
 from application.domain.authentication.adaptor.output.store import AuthenticationStoreAdaptor
 from application.domain.authentication.use_case import AuthenticationUseCase
+from application.domain.authentication.error import AuthenticationFail
 from application.domain.school_board.adaptor.input.http import SchoolBoardHttpInputAdaptor, school_board_router
 from application.domain.school_board.adaptor.output import SchoolSearchOutputAdaptor
 from application.domain.school_board.use_case import SchoolBoardUseCase
 from application.infra.sms import SMSSender
 
+
+def setup_exception_handlers(application: FastAPI):
+    @application.exception_handler(AuthenticationFail)
+    def handle_bad_request(request: Request, exc: AuthenticationFail):
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"error": str(exc)},
+        )
 
 def setup_application(
     *,
@@ -40,3 +51,5 @@ def setup_application(
 
     app.include_router(authentication_router, prefix="/authentication")
     app.include_router(school_board_router, prefix="/school")
+
+    setup_exception_handlers(app)
