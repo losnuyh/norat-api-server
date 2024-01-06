@@ -12,11 +12,6 @@ from .table import AuthPhoneTable
 
 
 class AuthenticationStoreAdaptor(AuthenticationStoreOutputPort):
-    def __init__(self, *, engine: AsyncEngine, readonly_engine: AsyncEngine):
-        self.engine = engine
-        self.readonly_engine = readonly_engine
-        super().__init__()
-
     async def save_auth_phone(self, *, authentication_phone: AuthenticationPhone):
         item = AuthPhoneTable(
             code=authentication_phone.code,

@@ -9,7 +9,9 @@ class UnitOfWork:
     readonly_engine: AsyncEngine
     __context_session: ContextVar[AsyncSession]
 
-    def __init__(self):
+    def __init__(self, *, engine: AsyncEngine, readonly_engine: AsyncEngine):
+        self.engine = engine
+        self.readonly_engine = readonly_engine
         self.__context_session = ContextVar("session")
         self.__read_only = False
 
