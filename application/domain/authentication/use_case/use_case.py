@@ -1,8 +1,8 @@
 from datetime import date, datetime, timedelta, timezone
 from random import choices
 
-from application.domain.authentication.error import AuthenticationFail
-from application.domain.authentication.model import AuthenticationPhone, PhoneToken, new_password_authenticator
+from application.domain.authentication.error import AuthenticationFail, PasswordNotMatched
+from application.domain.authentication.model import AuthenticationPhone, AuthToken, PasswordValidator, PhoneToken
 from application.domain.authentication.use_case.port.input import AuthenticationInputPort
 from application.domain.authentication.use_case.port.output import (
     AuthenticationStoreOutputPort,
@@ -49,10 +49,14 @@ class AuthenticationUseCase(AuthenticationInputPort):
             return token
 
     async def create_user_with_password(self, *, password: str, account: str, birth: date) -> User:
-        password_authenticator = new_password_authenticator(
-            user_account=account,
+        user = await self.user_app.create_user(account=account, birth=birth)
+        async with self.auth_store as uow:
+            assert user.id is not None
+            password_authenticator = PasswordValidator(raw_password=password).new_password_authenticator(
+                user_id=user.id,
+                user_account=account,
             user_password=password,
-        )
+            )
         user = await self.user_app.create_user(account=account, birth=birth)
         async with self.auth_store as uow:
             await uow.save_user_password_authenticator(password_authenticator=password_authenticator)

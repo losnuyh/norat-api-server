@@ -33,6 +33,7 @@ class AuthenticationStoreAdaptor(AuthenticationStoreOutputPort):
 
     async def save_user_password_authenticator(self, *, password_authenticator: PasswordAuthenticator):
         item = PasswordAuthenticatorTable(
+            user_id=password_authenticator.user_id,
             user_account=password_authenticator.user_account,
             hashed_password=password_authenticator.hashed_password,
             updated_at=datetime.now(tz=timezone.utc),

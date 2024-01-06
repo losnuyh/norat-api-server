@@ -1,5 +1,5 @@
 from .authentication_phone import AuthenticationPhone
-from .authenticator import PasswordAuthenticator, new_password_authenticator
+from .authenticator import PasswordAuthenticator, PasswordValidator
 from .token import AuthToken, PhoneToken
 
 __all__ = [
@@ -7,5 +7,5 @@ __all__ = [
     "PhoneToken",
     "AuthenticationPhone",
     "PasswordAuthenticator",
-    "new_password_authenticator",
+    "PasswordValidator",
 ]
