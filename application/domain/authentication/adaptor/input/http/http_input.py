@@ -6,9 +6,16 @@ from fastapi import APIRouter, Body, HTTPException, Query, status
 from application.domain.authentication.use_case.port.input import AuthenticationInputPort
 from application.infra.fastapi import WithFastAPIRouter
 
-from .dto import SendVerificationCodeToPhoneResponse, VerifyPhoneRequest, VerifyPhoneResponse
+from .dto import (
+    SendVerificationCodeToPhoneResponse,
+    UserSignupRequest,
+    UserSignupResponse,
+    VerifyPhoneRequest,
+    VerifyPhoneResponse,
+)
 
 authentication_router = APIRouter()
+user_router = APIRouter()
 
 
 def is_valid_phone(string):
@@ -17,6 +24,48 @@ def is_valid_phone(string):
         return True
     else:
         return False
+
+
+class UserInAuthenticationHttpInputAdaptor(WithFastAPIRouter):
+    def __init__(
+        self,
+        *,
+        input_adaptor: AuthenticationInputPort,
+    ):
+        self.input = input_adaptor
+
+    def signup(self):
+        @user_router.post(
+            path="",
+            tags=["user"],
+            summary="회원 가입",
+            description="</br>".join(["회원가입 합니다."]),
+            status_code=status.HTTP_200_OK,
+            response_description="유저 정보",
+            responses={
+                status.HTTP_200_OK: {
+                    "model": UserSignupResponse,
+                    "description": "가입 성공",
+                },
+                status.HTTP_400_BAD_REQUEST: {
+                    "description": "가입 실패",
+                },
+            },
+        )
+        async def handler(
+            body: Annotated[UserSignupRequest, Body()],
+        ):
+            user = await self.input.create_user_with_password(
+                password=body.password,
+                account=body.account,
+                birth=body.birth,
+            )
+            assert user.id is not None
+            return UserSignupResponse(
+                id=user.id,
+                account=user.account,
+                birth=user.birth,
+            )
 
 
 class AuthenticationHttpInputAdaptor(WithFastAPIRouter):

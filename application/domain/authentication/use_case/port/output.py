@@ -1,6 +1,9 @@
 from abc import ABC, abstractmethod
+from datetime import date
+from typing import Protocol
 
-from application.domain.authentication.model import AuthenticationPhone
+from application.domain.authentication.model import AuthenticationPhone, PasswordAuthenticator
+from application.domain.user.model import User
 from application.infra.unit_of_work.sqlalchemy import UnitOfWork
 
 
@@ -17,4 +20,13 @@ class AuthenticationStoreOutputPort(UnitOfWork, ABC):
 
     @abstractmethod
     async def get_authentication_phone(self, *, phone: str) -> AuthenticationPhone | None:
+        ...
+
+    @abstractmethod
+    async def save_user_password_authenticator(self, *, password_authenticator: PasswordAuthenticator):
+        ...
+
+
+class UserOutputPort(Protocol):
+    async def create_user(self, *, account: str, birth: date) -> User:
         ...

@@ -10,7 +10,7 @@ from application.domain.user.use_case.port.output import UserStoreOutputPort
 class UserStoreAdaptor(UserStoreOutputPort):
     async def get_user_by_account(self, *, account: str) -> User | None:
         stmt = select(UserTable).where(UserTable.account == account)
-        user_result: UserTable = self.session.scalar(stmt)
+        user_result: UserTable = await self.session.scalar(stmt)
         if user_result is None:
             return None
         return User(
@@ -27,5 +27,6 @@ class UserStoreAdaptor(UserStoreOutputPort):
             created_at=now,
         )
         self.session.add(user_row)
+        await self.session.flush()
         user.id = user_row.id
         return user

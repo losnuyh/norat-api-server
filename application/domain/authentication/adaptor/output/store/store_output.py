@@ -3,12 +3,11 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncEngine
 
-from application.domain.authentication.model import AuthenticationPhone
+from application.domain.authentication.model import AuthenticationPhone, PasswordAuthenticator
 from application.domain.authentication.use_case.port.output import AuthenticationStoreOutputPort
 
-from .table import AuthPhoneTable
+from .table import AuthPhoneTable, PasswordAuthenticatorTable
 
 
 class AuthenticationStoreAdaptor(AuthenticationStoreOutputPort):
@@ -31,3 +30,11 @@ class AuthenticationStoreAdaptor(AuthenticationStoreOutputPort):
             phone=data.phone,
             expired_at=data.expired_at.replace(tzinfo=timezone.utc),
         )
+
+    async def save_user_password_authenticator(self, *, password_authenticator: PasswordAuthenticator):
+        item = PasswordAuthenticatorTable(
+            user_account=password_authenticator.user_account,
+            hashed_password=password_authenticator.hashed_password,
+            updated_at=datetime.now(tz=timezone.utc),
+        )
+        self.session.add(item)

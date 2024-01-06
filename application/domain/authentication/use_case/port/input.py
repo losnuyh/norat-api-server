@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
+from datetime import date
 
 from application.domain.authentication.model import PhoneToken
+from application.domain.user.model import User
 
 
 class AuthenticationInputPort(ABC):
@@ -10,4 +12,8 @@ class AuthenticationInputPort(ABC):
 
     @abstractmethod
     async def get_phone_verification_token(self, *, phone: str, code: str) -> PhoneToken:
+        ...
+
+    @abstractmethod
+    async def create_user_with_password(self, *, password: str, account: str, birth: date) -> User:
         ...

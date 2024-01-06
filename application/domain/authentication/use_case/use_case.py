@@ -1,16 +1,28 @@
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from random import choices
 
 from application.domain.authentication.error import AuthenticationFail
-from application.domain.authentication.model import AuthenticationPhone, PhoneToken
+from application.domain.authentication.model import AuthenticationPhone, PhoneToken, new_password_authenticator
 from application.domain.authentication.use_case.port.input import AuthenticationInputPort
-from application.domain.authentication.use_case.port.output import AuthenticationStoreOutputPort, CodeSenderOutputPort
+from application.domain.authentication.use_case.port.output import (
+    AuthenticationStoreOutputPort,
+    CodeSenderOutputPort,
+    UserOutputPort,
+)
+from application.domain.user.model import User
 
 
 class AuthenticationUseCase(AuthenticationInputPort):
-    def __init__(self, *, code_sender: CodeSenderOutputPort, auth_store: AuthenticationStoreOutputPort):
+    def __init__(
+        self,
+        *,
+        code_sender: CodeSenderOutputPort,
+        auth_store: AuthenticationStoreOutputPort,
+        user_app: UserOutputPort,
+    ):
         self.code_sender = code_sender
         self.auth_store = auth_store
+        self.user_app = user_app
 
     async def send_verification_code_to_phone(self, *, phone_number: str) -> None:
         authentication_phone = AuthenticationPhone(
@@ -35,3 +47,14 @@ class AuthenticationUseCase(AuthenticationInputPort):
                 raise AuthenticationFail("authentication is not in progress")
             token = authentication_phone.get_token(code=code)
             return token
+
+    async def create_user_with_password(self, *, password: str, account: str, birth: date) -> User:
+        password_authenticator = new_password_authenticator(
+            user_account=account,
+            user_password=password,
+        )
+        user = await self.user_app.create_user(account=account, birth=birth)
+        async with self.auth_store as uow:
+            await uow.save_user_password_authenticator(password_authenticator=password_authenticator)
+            await uow.commit()
+        return user
