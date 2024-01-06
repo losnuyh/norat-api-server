@@ -11,7 +11,7 @@ class UserTable(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, kw_only=True)
     account: Mapped[str] = mapped_column(
-        String(30), nullable=False, kw_only=True, index=True,
+        String(30), nullable=False, kw_only=True, index=True, unique=True,
     )
     birth: Mapped[date] = mapped_column(nullable=False, kw_only=True)
     created_at: Mapped[datetime] = mapped_column(

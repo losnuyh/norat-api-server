@@ -2,7 +2,7 @@
 
 Revision ID: 0002
 Revises: 0001
-Create Date: 2024-01-06 15:55:46.178559
+Create Date: 2024-01-06 16:02:53.829133
 
 """
 from typing import Sequence, Union
@@ -27,7 +27,7 @@ def upgrade() -> None:
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_user_account'), 'user', ['account'], unique=False)
+    op.create_index(op.f('ix_user_account'), 'user', ['account'], unique=True)
     # ### end Alembic commands ###
 
 
