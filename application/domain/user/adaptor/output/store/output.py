@@ -2,9 +2,9 @@ from datetime import datetime, timezone
 
 from sqlalchemy import select
 
-from application.domain.user.adaptor.output.store import UserTable
 from application.domain.user.model.user import User
 from application.domain.user.use_case.port.output import UserStoreOutputPort
+from .table import UserTable
 
 
 class UserStoreAdaptor(UserStoreOutputPort):
