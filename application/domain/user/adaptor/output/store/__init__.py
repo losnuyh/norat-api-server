@@ -1,7 +1,7 @@
-# from .base import Base as UserBase
-from .table import AdminTable
+from .base import Base as UserBase
+from .table import UserTable
 
 __all__ = [
-    # "UserBase",
-    "AdminTable",
+    "UserBase",
+    "UserTable",
 ]
