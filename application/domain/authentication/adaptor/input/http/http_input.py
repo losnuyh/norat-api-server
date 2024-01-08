@@ -8,8 +8,10 @@ from application.infra.fastapi import WithFastAPIRouter
 
 from .dto import (
     SendVerificationCodeToPhoneResponse,
+    UserLoginRequest,
     UserSignupRequest,
     UserSignupResponse,
+    UserTokenResponse,
     VerifyPhoneRequest,
     VerifyPhoneResponse,
 )
@@ -137,3 +139,30 @@ class AuthenticationHttpInputAdaptor(WithFastAPIRouter):
                 code=body.code,
             )
             return VerifyPhoneResponse(verified_phone_token=phone_token.access_token)
+
+    def login_with_password(self):
+        @authentication_router.post(
+            path="/login",
+            tags=["auth"],
+            summary="로그인",
+            description="</br>".join(["비밀번호로 로그인하여 토큰을 획득합니다."]),
+            status_code=status.HTTP_200_OK,
+            response_description="토큰과 리프레쉬 토큰",
+            responses={
+                status.HTTP_200_OK: {
+                    "model": UserTokenResponse,
+                    "description": "로그인 성공",
+                },
+                status.HTTP_400_BAD_REQUEST: {
+                    "description": "로그인 실패",
+                },
+            },
+        )
+        async def handler(
+            body: Annotated[UserLoginRequest, Body()],
+        ):
+            token = await self.input.login_user_with_password(account=body.account, password=body.password)
+            return UserTokenResponse(
+                access_token=token.access_token,
+                refresh_token=token.refresh_token,
+            )

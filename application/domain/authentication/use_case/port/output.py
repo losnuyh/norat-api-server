@@ -26,6 +26,10 @@ class AuthenticationStoreOutputPort(UnitOfWork, ABC):
     async def save_user_password_authenticator(self, *, password_authenticator: PasswordAuthenticator):
         ...
 
+    @abstractmethod
+    async def get_user_password_authenticator(self, *, account: str) -> PasswordAuthenticator:
+        ...
+
 
 class UserOutputPort(Protocol):
     async def create_user(self, *, account: str, birth: date) -> User:

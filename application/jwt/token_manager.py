@@ -5,7 +5,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from jwt.exceptions import DecodeError, InvalidTokenError
 
-from application.jwt.token_type import PhoneAuthenticationTokenPayload
+from application.jwt.token_type import PhoneAuthenticationTokenPayload, UserAuthenticationTokenPayload
 
 
 class JwtTokenManager:
@@ -53,6 +53,18 @@ class JwtTokenManager:
         return self._create_jwt(
             payload={
                 "phone": payload["phone"],
+                "exp": payload["expired_at"].timestamp(),
+            },
+        )
+
+    def create_user_authentication_token(
+        self,
+        *,
+        payload: UserAuthenticationTokenPayload,
+    ):
+        return self._create_jwt(
+            payload={
+                "user_id": payload["user_id"],
                 "exp": payload["expired_at"].timestamp(),
             },
         )

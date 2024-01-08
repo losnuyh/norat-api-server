@@ -44,14 +44,24 @@ class PasswordAuthenticatorTable(Base):
     )
     user_account: Mapped[str] = mapped_column(
         String(32),
-        kw_only=True, index=True,
+        kw_only=True,
+        index=True,
     )
     hashed_password: Mapped[str] = mapped_column(
         String(128),
         nullable=False,
         kw_only=True,
     )
-    updated_at: Mapped[datetime] = mapped_column(
+    password_updated_at: Mapped[datetime] = mapped_column(
+        nullable=False,
+        kw_only=True,
+    )
+    refresh_token: Mapped[str] = mapped_column(
+        String(128),
+        nullable=False,
+        kw_only=True,
+    )
+    refresh_token_expired_at: Mapped[datetime] = mapped_column(
         nullable=False,
         kw_only=True,
     )

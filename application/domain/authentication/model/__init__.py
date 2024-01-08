@@ -1,4 +1,4 @@
-from .authentication_phone import AuthenticationPhone
+from .authentication import AuthenticationPhone
 from .authenticator import PasswordAuthenticator, PasswordValidator
 from .token import AuthToken, PhoneToken
 

@@ -40,3 +40,13 @@ class UserSignupResponse(BaseModel):
     id: int = Field(title="유저 아이디")
     account: str = Field(title="유저 계정")
     birth: date = Field(title="생일 정보")
+
+
+class UserLoginRequest(BaseModel):
+    account: str = Field(title="유저 아이디")
+    password: str = Field(title="유저 비밀번호")
+
+
+class UserTokenResponse(BaseModel):
+    access_token: str = Field(title="엑세스 토큰")
+    refresh_token: str = Field(title="리프레쉬 토큰")
