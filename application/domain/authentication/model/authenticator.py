@@ -49,34 +49,19 @@ class PasswordAuthenticator:
         return self._generate_token()
 
 
-@dataclass
-class PasswordValidator:
-    raw_password: str
-
-    @staticmethod
-    def _validate_password(password: str):
-        if len(password) < 8 | len(password) > 32:
-            raise PasswordValidationFail("password length must be greater than 8 and less than 32")
-
-    def __post_init__(self):
-        self._validate_password(self.raw_password)
-
-    def new_password_authenticator(
-        self,
-        *,
-        user_id: int,
-        user_account: str,
-    ) -> PasswordAuthenticator:
-        hashed_password = bcrypt.hashpw(
-            self.raw_password.encode(),
-            bcrypt.gensalt(14),
-        )
-        now = datetime.now(tz=timezone.utc)
-        return PasswordAuthenticator(
-            user_id=user_id,
-            user_account=user_account,
-            hashed_password=hashed_password,
-            password_update_at=now,
-            refresh_token=token_hex(),
-            refresh_token_expired_at=now + timedelta(days=365),
-        )
+def new_password_authenticator(user_id: int, user_account: str, password: str):
+    if len(password) < 8 | len(password) > 32:
+        raise PasswordValidationFail("password length must be greater than 8 and less than 32")
+    hashed_password = bcrypt.hashpw(
+        password.encode(),
+        bcrypt.gensalt(14),
+    )
+    now = datetime.now(tz=timezone.utc)
+    return PasswordAuthenticator(
+        user_id=user_id,
+        user_account=user_account,
+        hashed_password=hashed_password,
+        password_update_at=now,
+        refresh_token=token_hex(),
+        refresh_token_expired_at=now + timedelta(days=365),
+    )

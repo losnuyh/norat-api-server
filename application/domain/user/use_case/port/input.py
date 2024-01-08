@@ -6,7 +6,13 @@ from application.domain.user.model import User
 
 class UserInputPort(ABC):
     @abstractmethod
-    async def create_user(self, *, account: str, birth: date) -> User:
+    async def create_user_with_password(
+        self,
+        *,
+        account: str,
+        password: str,
+        birth: date,
+    ) -> User:
         ...
 
     @abstractmethod

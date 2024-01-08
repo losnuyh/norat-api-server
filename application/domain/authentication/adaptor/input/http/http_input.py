@@ -9,15 +9,12 @@ from application.infra.fastapi import WithFastAPIRouter
 from .dto import (
     SendVerificationCodeToPhoneResponse,
     UserLoginRequest,
-    UserSignupRequest,
-    UserSignupResponse,
     UserTokenResponse,
     VerifyPhoneRequest,
     VerifyPhoneResponse,
 )
 
 authentication_router = APIRouter()
-user_router = APIRouter()
 
 
 def is_valid_phone(string):
@@ -26,48 +23,6 @@ def is_valid_phone(string):
         return True
     else:
         return False
-
-
-class UserInAuthenticationHttpInputAdaptor(WithFastAPIRouter):
-    def __init__(
-        self,
-        *,
-        input_adaptor: AuthenticationInputPort,
-    ):
-        self.input = input_adaptor
-
-    def signup(self):
-        @user_router.post(
-            path="",
-            tags=["user"],
-            summary="회원 가입",
-            description="</br>".join(["회원가입 합니다."]),
-            status_code=status.HTTP_200_OK,
-            response_description="유저 정보",
-            responses={
-                status.HTTP_200_OK: {
-                    "model": UserSignupResponse,
-                    "description": "가입 성공",
-                },
-                status.HTTP_400_BAD_REQUEST: {
-                    "description": "가입 실패",
-                },
-            },
-        )
-        async def handler(
-            body: Annotated[UserSignupRequest, Body()],
-        ):
-            user = await self.input.create_user_with_password(
-                password=body.password,
-                account=body.account,
-                birth=body.birth,
-            )
-            assert user.id is not None
-            return UserSignupResponse(
-                id=user.id,
-                account=user.account,
-                birth=user.birth,
-            )
 
 
 class AuthenticationHttpInputAdaptor(WithFastAPIRouter):
@@ -155,6 +110,35 @@ class AuthenticationHttpInputAdaptor(WithFastAPIRouter):
                 },
                 status.HTTP_400_BAD_REQUEST: {
                     "description": "로그인 실패",
+                },
+            },
+        )
+        async def handler(
+            body: Annotated[UserLoginRequest, Body()],
+        ):
+            token = await self.input.login_user_with_password(account=body.account, password=body.password)
+            return UserTokenResponse(
+                access_token=token.access_token,
+                refresh_token=token.refresh_token,
+            )
+
+    def refresh_token(self):
+        @authentication_router.post(
+            path="/refresh",
+            tags=["auth"],
+            summary="토큰 재발급",
+            description="</br>".join(
+                ["리프레쉬 토큰으로 토큰을 재발급합니다.", "리프레쉬토큰은 로그인때 발급받은 데이터를 사용합니다.", "리프레쉬 토큰 유효 기간은 1년입니다."],
+            ),
+            status_code=status.HTTP_200_OK,
+            response_description="토큰과 리프레쉬 토큰",
+            responses={
+                status.HTTP_200_OK: {
+                    "model": UserTokenResponse,
+                    "description": "재발급 성공",
+                },
+                status.HTTP_400_BAD_REQUEST: {
+                    "description": "재발급 실패",
                 },
             },
         )

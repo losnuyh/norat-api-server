@@ -1,11 +1,11 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Query, status
+from fastapi import APIRouter, Body, Query, status
 
 from application.domain.user.use_case.port.input import UserInputPort
 from application.infra.fastapi import WithFastAPIRouter
 
-from .dto import CheckUserAccountDuplicationResponse
+from .dto import CheckUserAccountDuplicationResponse, UserSignupRequest, UserSignupResponse
 
 user_router = APIRouter()
 
@@ -30,4 +30,37 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
             return CheckUserAccountDuplicationResponse(
                 account=account,
                 is_exist=is_exist,
+            )
+
+    def signup(self):
+        @user_router.post(
+            path="",
+            tags=["user"],
+            summary="회원 가입",
+            description="</br>".join(["회원가입 합니다."]),
+            status_code=status.HTTP_200_OK,
+            response_description="유저 정보",
+            responses={
+                status.HTTP_200_OK: {
+                    "model": UserSignupResponse,
+                    "description": "가입 성공",
+                },
+                status.HTTP_400_BAD_REQUEST: {
+                    "description": "가입 실패",
+                },
+            },
+        )
+        async def handler(
+            body: Annotated[UserSignupRequest, Body()],
+        ):
+            user = await self.input.create_user_with_password(
+                password=body.password,
+                account=body.account,
+                birth=body.birth,
+            )
+            assert user.id is not None
+            return UserSignupResponse(
+                id=user.id,
+                account=user.account,
+                birth=user.birth,
             )

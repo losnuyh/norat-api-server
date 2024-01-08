@@ -1,5 +1,3 @@
-from datetime import date
-
 from pydantic import BaseModel, Field
 
 
@@ -28,18 +26,6 @@ class VerifyPhoneResponse(BaseModel):
         title="인증 증명 토큰",
         description="핸드폰 번호 인증을 증명하는 토큰",
     )
-
-
-class UserSignupRequest(BaseModel):
-    account: str = Field(title="유저 계정")
-    birth: date = Field(title="생일 정보")
-    password: str = Field(title="비밀번호")
-
-
-class UserSignupResponse(BaseModel):
-    id: int = Field(title="유저 아이디")
-    account: str = Field(title="유저 계정")
-    birth: date = Field(title="생일 정보")
 
 
 class UserLoginRequest(BaseModel):

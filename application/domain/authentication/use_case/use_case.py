@@ -1,15 +1,15 @@
-from datetime import date, datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone
 from random import choices
 
 from application.domain.authentication.error import AuthenticationFail
-from application.domain.authentication.model import AuthenticationPhone, AuthToken, PasswordValidator, PhoneToken
-from application.domain.authentication.use_case.port.input import AuthenticationInputPort
-from application.domain.authentication.use_case.port.output import (
-    AuthenticationStoreOutputPort,
-    CodeSenderOutputPort,
-    UserOutputPort,
+from application.domain.authentication.model import (
+    AuthenticationPhone,
+    AuthToken,
+    PhoneToken,
+    new_password_authenticator,
 )
-from application.domain.user.model import User
+from application.domain.authentication.use_case.port.input import AuthenticationInputPort, UserData
+from application.domain.authentication.use_case.port.output import AuthenticationStoreOutputPort, CodeSenderOutputPort
 
 
 class AuthenticationUseCase(AuthenticationInputPort):
@@ -18,11 +18,9 @@ class AuthenticationUseCase(AuthenticationInputPort):
         *,
         code_sender: CodeSenderOutputPort,
         auth_store: AuthenticationStoreOutputPort,
-        user_app: UserOutputPort,
     ):
         self.code_sender = code_sender
         self.auth_store = auth_store
-        self.user_app = user_app
 
     async def send_verification_code_to_phone(self, *, phone_number: str) -> None:
         authentication_phone = AuthenticationPhone(
@@ -48,18 +46,15 @@ class AuthenticationUseCase(AuthenticationInputPort):
             token = authentication_phone.get_user_authentication(code=code)
             return token
 
-    async def create_user_with_password(self, *, password: str, account: str, birth: date) -> User:
-        authenticator = PasswordValidator(raw_password=password)
-        user = await self.user_app.create_user(account=account, birth=birth)
+    async def create_user_password_authenticator(self, *, user_data: UserData, password: str):
         async with self.auth_store as uow:
-            assert user.id is not None
-            password_authenticator = authenticator.new_password_authenticator(
-                user_id=user.id,
-                user_account=account,
+            password_authenticator = new_password_authenticator(
+                user_id=user_data.id,
+                user_account=user_data.account,
+                password=password,
             )
             await uow.save_user_password_authenticator(password_authenticator=password_authenticator)
             await uow.commit()
-        return user
 
     async def login_user_with_password(self, *, account: str, password: str) -> AuthToken:
         async with self.auth_store(read_only=True) as uow:

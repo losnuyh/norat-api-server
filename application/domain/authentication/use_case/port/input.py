@@ -1,8 +1,6 @@
 from abc import ABC, abstractmethod
-from datetime import date
 
-from application.domain.authentication.model import AuthToken, PhoneToken
-from application.domain.user.model import User
+from application.domain.authentication.model import AuthToken, PhoneToken, UserData
 
 
 class AuthenticationInputPort(ABC):
@@ -15,7 +13,7 @@ class AuthenticationInputPort(ABC):
         ...
 
     @abstractmethod
-    async def create_user_with_password(self, *, password: str, account: str, birth: date) -> User:
+    async def create_user_password_authenticator(self, *, user_data: UserData, password: str):
         ...
 
     @abstractmethod
