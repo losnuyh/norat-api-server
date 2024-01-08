@@ -14,6 +14,11 @@ class UserTable(Base):
         String(30), nullable=False, kw_only=True, index=True, unique=True,
     )
     birth: Mapped[date] = mapped_column(nullable=False, kw_only=True)
+    phone: Mapped[str] = mapped_column(
+        String(30),
+        nullable=False,
+        kw_only=True,
+    )
     created_at: Mapped[datetime] = mapped_column(
         nullable=False,
         kw_only=True,

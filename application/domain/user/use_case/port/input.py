@@ -10,6 +10,7 @@ class UserInputPort(ABC):
         self,
         *,
         account: str,
+        phone: str,
         password: str,
         birth: date,
     ) -> User:

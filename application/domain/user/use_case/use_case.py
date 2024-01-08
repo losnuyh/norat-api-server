@@ -21,13 +21,14 @@ class UserUseCase(UserInputPort):
         self,
         *,
         account: str,
+        phone: str,
         password: str,
         birth: date,
     ) -> User:
         async with self.user_store as uow:
             if await uow.get_user_by_account(account=account):
                 raise AccountIsDuplicated(f"account: {account} is duplicated")
-            user = User(account=account, birth=birth)
+            user = User(account=account, birth=birth, phone=phone)
             await uow.save_user(user=user)
             assert user.id is not None
             await self.auth_app.create_user_password_authenticator(

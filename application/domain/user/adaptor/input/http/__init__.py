@@ -1,9 +1,10 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Body, Query, status
+from fastapi import APIRouter, Body, Query, status, Depends
 
 from application.domain.user.use_case.port.input import UserInputPort
 from application.infra.fastapi import WithFastAPIRouter
+from application.infra.fastapi.auth import get_authenticated_phone
 
 from .dto import CheckUserAccountDuplicationResponse, UserSignupRequest, UserSignupResponse
 
@@ -37,7 +38,7 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
             path="",
             tags=["user"],
             summary="회원 가입",
-            description="</br>".join(["회원가입 합니다."]),
+            description="</br>".join(["회원가입 합니다.", "가입 요칭시 phone 인증 토큰을 필요로 합니다."]),
             status_code=status.HTTP_200_OK,
             response_description="유저 정보",
             responses={
@@ -51,11 +52,13 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
             },
         )
         async def handler(
+            phone: Annotated[str, Depends(get_authenticated_phone)],
             body: Annotated[UserSignupRequest, Body()],
         ):
             user = await self.input.create_user_with_password(
                 password=body.password,
                 account=body.account,
+                phone=phone,
                 birth=body.birth,
             )
             assert user.id is not None

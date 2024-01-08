@@ -16,6 +16,7 @@ class UserStoreAdaptor(UserStoreOutputPort):
         return User(
             id=user_result.id,
             account=user_result.account,
+            phone=user_result.phone,
             birth=user_result.birth,
         )
 
@@ -23,6 +24,7 @@ class UserStoreAdaptor(UserStoreOutputPort):
         now = datetime.now(tz=timezone.utc)
         user_row = UserTable(
             account=user.account,
+            phone=user.phone,
             birth=user.birth,
             created_at=now,
         )

@@ -6,4 +6,5 @@ from datetime import date
 class User:
     id: int | None = None
     account: str
+    phone: str
     birth: date

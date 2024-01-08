@@ -43,7 +43,7 @@ class AuthenticationUseCase(AuthenticationInputPort):
             authentication_phone = await uow.get_authentication_phone(phone=phone)
             if authentication_phone is None:
                 raise AuthenticationFail("authentication is not in progress")
-            token = authentication_phone.get_user_authentication(code=code)
+            token = authentication_phone.get_token(code=code)
             return token
 
     async def create_user_password_authenticator(self, *, user_data: UserData, password: str):
