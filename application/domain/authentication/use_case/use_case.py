@@ -71,3 +71,13 @@ class AuthenticationUseCase(AuthenticationInputPort):
                 raise AuthenticationFail("refresh token is expired")
 
             return password_authenticator.get_token_by_refresh_token(refresh_token=refresh_token)
+
+    async def change_password(self, *, user_id: int, password: str, new_password: str):
+        async with self.auth_store() as uow:
+            password_authenticator = await uow.get_user_password_authenticator_by_user_id(user_id=user_id)
+            if password_authenticator is None:
+                raise AuthenticationFail("authentication not found")
+
+            password_authenticator.change_password(password=password, new_password=new_password)
+            await uow.save_user_password_authenticator(password_authenticator=password_authenticator)
+            await uow.commit()

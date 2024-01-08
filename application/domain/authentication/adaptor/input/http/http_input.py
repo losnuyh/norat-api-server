@@ -9,6 +9,7 @@ from application.infra.fastapi import WithFastAPIRouter
 from application.infra.fastapi.auth import get_authenticated_user
 
 from .dto import (
+    ChangePasswordRequest,
     SendVerificationCodeToPhoneResponse,
     UserLoginRequest,
     UserTokenRefreshRequest,
@@ -160,3 +161,32 @@ class AuthenticationHttpInputAdaptor(WithFastAPIRouter):
                 access_token=token.access_token,
                 refresh_token=token.refresh_token,
             )
+
+    def change_password(self):
+        @authentication_router.put(
+            path="/password",
+            tags=["auth"],
+            summary="비밀번호 변경",
+            description="</br>".join(
+                ["비밀번호를 변경합니다.", "이번 비밀번호와 새로 사용할 비밀번호를 요청에 포함해야합니다."],
+            ),
+            status_code=status.HTTP_200_OK,
+            responses={
+                status.HTTP_200_OK: {
+                    "description": "성공",
+                },
+                status.HTTP_400_BAD_REQUEST: {
+                    "description": "실패",
+                },
+            },
+        )
+        async def handler(
+            user_id: Annotated[int, Depends(get_authenticated_user_for_refresh)],
+            body: Annotated[ChangePasswordRequest, Body()],
+        ):
+            await self.input.change_password(
+                user_id=user_id,
+                password=body.password,
+                new_password=body.new_password,
+            )
+            return {"message": "success"}

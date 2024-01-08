@@ -40,3 +40,8 @@ class UserTokenResponse(BaseModel):
 
 class UserTokenRefreshRequest(BaseModel):
     refresh_token: str = Field(title="리프레쉬 토큰")
+
+
+class ChangePasswordRequest(BaseModel):
+    password: str = Field(title="현재 비밀번호")
+    new_password: str = Field(title="변경할 비밀번호")

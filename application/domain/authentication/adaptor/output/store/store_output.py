@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from sqlalchemy import select
+from sqlalchemy.dialects.mysql import insert
 
 from application.domain.authentication.model import AuthenticationPhone, PasswordAuthenticator
 from application.domain.authentication.use_case.port.output import AuthenticationStoreOutputPort
@@ -32,7 +33,7 @@ class AuthenticationStoreAdaptor(AuthenticationStoreOutputPort):
         )
 
     async def save_user_password_authenticator(self, *, password_authenticator: PasswordAuthenticator):
-        item = PasswordAuthenticatorTable(
+        values = dict(
             user_id=password_authenticator.user_id,
             user_account=password_authenticator.user_account,
             hashed_password=password_authenticator.hashed_password,
@@ -40,7 +41,8 @@ class AuthenticationStoreAdaptor(AuthenticationStoreOutputPort):
             refresh_token=password_authenticator.refresh_token,
             refresh_token_expired_at=password_authenticator.refresh_token_expired_at.astimezone(tz=timezone.utc),
         )
-        self.session.add(item)
+        stmt = insert(PasswordAuthenticatorTable).values(**values).on_duplicate_key_update(**values)
+        await self.session.execute(stmt)
 
     async def get_user_password_authenticator_by_user_id(self, *, user_id: int) -> PasswordAuthenticator | None:
         stmt = select(PasswordAuthenticatorTable).where(PasswordAuthenticatorTable.user_id == user_id)

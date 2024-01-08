@@ -23,3 +23,7 @@ class AuthenticationInputPort(ABC):
     @abstractmethod
     async def refresh_user_token(self, *, user_id: int, refresh_token: str) -> AuthToken:
         ...
+
+    @abstractmethod
+    async def change_password(self, *, user_id: int, password: str, new_password: str):
+        ...

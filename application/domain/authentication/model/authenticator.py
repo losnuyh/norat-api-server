@@ -10,6 +10,13 @@ from application.jwt import jwt_token_manager
 from .token import AuthToken
 
 
+def hash_password(raw: str) -> bytes:
+    return bcrypt.hashpw(
+        raw.encode(),
+        bcrypt.gensalt(14),
+    )
+
+
 @dataclass
 class PasswordAuthenticator:
     user_id: int
@@ -38,6 +45,11 @@ class PasswordAuthenticator:
             refresh_token=self.refresh_token,
         )
 
+    def change_password(self, password: str, new_password: str):
+        if not self._check_password(password=password):
+            raise PasswordNotMatched("wrong password")
+        self.hashed_password = hash_password(raw=new_password)
+
     def get_token_by_password(self, *, password: str) -> AuthToken:
         if not self._check_password(password=password):
             raise PasswordNotMatched("wrong password")
@@ -52,10 +64,8 @@ class PasswordAuthenticator:
 def new_password_authenticator(user_id: int, user_account: str, password: str):
     if len(password) < 8 | len(password) > 32:
         raise PasswordValidationFail("password length must be greater than 8 and less than 32")
-    hashed_password = bcrypt.hashpw(
-        password.encode(),
-        bcrypt.gensalt(14),
-    )
+
+    hashed_password = hash_password(raw=password)
     now = datetime.now(tz=timezone.utc)
     return PasswordAuthenticator(
         user_id=user_id,
