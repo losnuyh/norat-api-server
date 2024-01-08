@@ -27,7 +27,11 @@ class AuthenticationStoreOutputPort(UnitOfWork, ABC):
         ...
 
     @abstractmethod
-    async def get_user_password_authenticator(self, *, account: str) -> PasswordAuthenticator:
+    async def get_user_password_authenticator_by_user_id(self, *, user_id: int) -> PasswordAuthenticator | None:
+        ...
+
+    @abstractmethod
+    async def get_user_password_authenticator_by_user_account(self, *, account: str) -> PasswordAuthenticator | None:
         ...
 
 

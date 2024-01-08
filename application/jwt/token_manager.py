@@ -68,3 +68,15 @@ class JwtTokenManager:
                 "exp": payload["expired_at"].timestamp(),
             },
         )
+
+    def get_user_authentication_payload(
+        self, *, jwt_token: str, verify_exp: bool = True
+    ) -> UserAuthenticationTokenPayload:
+        payload = self._get_payload(jwt_token=jwt_token, verify_exp=verify_exp)
+        try:
+            return UserAuthenticationTokenPayload(
+                user_id=payload["user_id"],
+                expired_at=datetime.fromtimestamp(payload["exp"], tz=timezone.utc),
+            )
+        except KeyError as e:
+            raise InvalidTokenError(f"token is wrong, token payload KeyError: {str(e)}")

@@ -42,7 +42,21 @@ class AuthenticationStoreAdaptor(AuthenticationStoreOutputPort):
         )
         self.session.add(item)
 
-    async def get_user_password_authenticator(self, *, account: str) -> PasswordAuthenticator:
+    async def get_user_password_authenticator_by_user_id(self, *, user_id: int) -> PasswordAuthenticator | None:
+        stmt = select(PasswordAuthenticatorTable).where(PasswordAuthenticatorTable.user_id == user_id)
+        data: PasswordAuthenticatorTable = await self.session.scalar(stmt)
+        if data is None:
+            return None
+        return PasswordAuthenticator(
+            user_id=data.user_id,
+            user_account=data.user_account,
+            hashed_password=data.hashed_password.encode(),
+            password_update_at=data.password_updated_at.replace(tzinfo=timezone.utc),
+            refresh_token=data.refresh_token,
+            refresh_token_expired_at=data.refresh_token_expired_at.replace(tzinfo=timezone.utc),
+        )
+
+    async def get_user_password_authenticator_by_user_account(self, *, account: str) -> PasswordAuthenticator | None:
         stmt = select(PasswordAuthenticatorTable).where(PasswordAuthenticatorTable.user_account == account)
         data: PasswordAuthenticatorTable = await self.session.scalar(stmt)
         if data is None:

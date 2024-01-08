@@ -44,7 +44,7 @@ class PasswordAuthenticator:
         return self._generate_token()
 
     def get_token_by_refresh_token(self, *, refresh_token: str) -> AuthToken:
-        if self.refresh_token == refresh_token and self.refresh_token_expired_at >= datetime.now(tz=timezone.utc):
+        if self.refresh_token != refresh_token or self.refresh_token_expired_at < datetime.now(tz=timezone.utc):
             raise AuthenticationFail("refresh token is not correct")
         return self._generate_token()
 

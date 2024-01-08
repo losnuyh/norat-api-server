@@ -36,3 +36,7 @@ class UserLoginRequest(BaseModel):
 class UserTokenResponse(BaseModel):
     access_token: str = Field(title="엑세스 토큰")
     refresh_token: str = Field(title="리프레쉬 토큰")
+
+
+class UserTokenRefreshRequest(BaseModel):
+    refresh_token: str = Field(title="리프레쉬 토큰")

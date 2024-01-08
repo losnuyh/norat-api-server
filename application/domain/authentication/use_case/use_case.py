@@ -58,5 +58,16 @@ class AuthenticationUseCase(AuthenticationInputPort):
 
     async def login_user_with_password(self, *, account: str, password: str) -> AuthToken:
         async with self.auth_store(read_only=True) as uow:
-            password_authenticator = await uow.get_user_password_authenticator(account=account)
+            password_authenticator = await uow.get_user_password_authenticator_by_user_account(account=account)
             return password_authenticator.get_token_by_password(password=password)
+
+    async def refresh_user_token(self, *, user_id: int, refresh_token: str) -> AuthToken:
+        async with self.auth_store(read_only=True) as uow:
+            password_authenticator = await uow.get_user_password_authenticator_by_user_id(user_id=user_id)
+            if password_authenticator is None:
+                raise AuthenticationFail("authentication not found")
+
+            if password_authenticator.refresh_token_expired_at < datetime.now(tz=timezone.utc):
+                raise AuthenticationFail("refresh token is expired")
+
+            return password_authenticator.get_token_by_refresh_token(refresh_token=refresh_token)

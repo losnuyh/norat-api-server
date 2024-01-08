@@ -1,20 +1,26 @@
 import re
+from functools import partial
 from typing import Annotated
 
-from fastapi import APIRouter, Body, HTTPException, Query, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Query, status
 
 from application.domain.authentication.use_case.port.input import AuthenticationInputPort
 from application.infra.fastapi import WithFastAPIRouter
+from application.infra.fastapi.auth import get_authenticated_user
 
 from .dto import (
     SendVerificationCodeToPhoneResponse,
     UserLoginRequest,
+    UserTokenRefreshRequest,
     UserTokenResponse,
     VerifyPhoneRequest,
     VerifyPhoneResponse,
 )
 
 authentication_router = APIRouter()
+
+
+get_authenticated_user_for_refresh = partial(get_authenticated_user, verify_exp=False)
 
 
 def is_valid_phone(string):
@@ -143,9 +149,13 @@ class AuthenticationHttpInputAdaptor(WithFastAPIRouter):
             },
         )
         async def handler(
-            body: Annotated[UserLoginRequest, Body()],
+            user_id: Annotated[int, Depends(get_authenticated_user_for_refresh)],
+            body: Annotated[UserTokenRefreshRequest, Body()],
         ):
-            token = await self.input.login_user_with_password(account=body.account, password=body.password)
+            token = await self.input.refresh_user_token(
+                user_id=user_id,
+                refresh_token=body.refresh_token,
+            )
             return UserTokenResponse(
                 access_token=token.access_token,
                 refresh_token=token.refresh_token,
