@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncEngine
 from starlette import status
 
+from application.config import app_config
 from application.domain.authentication.adaptor.input.http import AuthenticationHttpInputAdaptor, authentication_router
 from application.domain.authentication.adaptor.output.sms_sender import SMSCodeSenderOutputAdaptor
 from application.domain.authentication.adaptor.output.store import AuthenticationStoreAdaptor
@@ -59,7 +60,9 @@ def setup_application(
     )
 
     school_use_case = SchoolBoardUseCase(
-        search_output=SchoolSearchOutputAdaptor(),
+        search_output=SchoolSearchOutputAdaptor(
+            key=app_config.NEIS_KEY,
+        ),
     )
     school_http_application = SchoolBoardHttpInputAdaptor(
         input_adaptor=school_use_case,
