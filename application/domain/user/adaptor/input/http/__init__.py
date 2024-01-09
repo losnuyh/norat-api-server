@@ -1,12 +1,13 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Body, Query, status, Depends
+from fastapi import APIRouter, Body, Depends, Path, Query, status
 
 from application.domain.user.use_case.port.input import UserInputPort
+from application.error import PermissionDenied
 from application.infra.fastapi import WithFastAPIRouter
-from application.infra.fastapi.auth import get_authenticated_phone
+from application.infra.fastapi.auth import get_authenticated_phone, get_authenticated_user
 
-from .dto import CheckUserAccountDuplicationResponse, UserSignupRequest, UserSignupResponse
+from .dto import CertificationRequest, CheckUserAccountDuplicationResponse, UserSignupRequest, UserSignupResponse
 
 user_router = APIRouter()
 
@@ -67,3 +68,37 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
                 account=user.account,
                 birth=user.birth,
             )
+
+    def certification(self):
+        @user_router.post(
+            path="/{user_id}/certification/self",
+            tags=["user"],
+            summary="본인 인증 완료 요청",
+            description="</br>".join(
+                [
+                    "포트원 본인인증 완료 후, 인증 완료 처리를 서버에 요청합니다.",
+                    "포트원 본인인증 후 받은 imp_uid를 전송합니다.",
+                    "본인 인증인 경우에만 가능합니다. 부모 인증은 허용하지 않습니다.",
+                    "가입시 입력한 정보가 14세 미만인 경우에는 본인인증 api를 호출할 수 없습니다.",
+                ],
+            ),
+            status_code=status.HTTP_200_OK,
+            responses={
+                status.HTTP_200_OK: {
+                    "description": "성공",
+                },
+                status.HTTP_400_BAD_REQUEST: {
+                    "description": "실패",
+                },
+            },
+        )
+        async def handler(
+            user_id: Annotated[int, Path()],
+            body: Annotated[CertificationRequest, Body()],
+            request_user_id: Annotated[str, Depends(get_authenticated_user)],
+        ):
+            if user_id != request_user_id:
+                raise PermissionDenied("Not permitted")
+
+            await self.input.self_certification(user_id=user_id, imp_uid=body.imp_uid)
+            return {"message": "success"}

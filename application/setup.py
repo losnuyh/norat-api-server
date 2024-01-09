@@ -13,20 +13,32 @@ from application.domain.school_board.adaptor.input.http import SchoolBoardHttpIn
 from application.domain.school_board.adaptor.output import SchoolSearchOutputAdaptor
 from application.domain.school_board.use_case import SchoolBoardUseCase
 from application.domain.user.adaptor.input.http import UserHttpInputAdaptor, user_router
+from application.domain.user.adaptor.output.certification import CertificationOutputAdaptor
 from application.domain.user.adaptor.output.store import UserStoreAdaptor
-from application.domain.user.error import AccountIsDuplicated
+from application.domain.user.error import AccountIsDuplicated, CertificationIsWrong
 from application.domain.user.use_case import UserUseCase
+from application.error import InvalidData, NotFound, PermissionDenied
 from application.infra.sms import SMSSender
 
 
 def setup_exception_handlers(application: FastAPI):
+    @application.exception_handler(PermissionDenied)
     @application.exception_handler(AuthenticationFail)
     @application.exception_handler(AccountIsDuplicated)
     @application.exception_handler(PasswordNotMatched)
     @application.exception_handler(PasswordValidationFail)
+    @application.exception_handler(CertificationIsWrong)
+    @application.exception_handler(InvalidData)
     def handle_bad_request(request: Request, exc: AuthenticationFail):
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
+            content={"error": str(exc)},
+        )
+
+    @application.exception_handler(NotFound)
+    def handle_not_found_request(request: Request, exc: AuthenticationFail):
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
             content={"error": str(exc)},
         )
 
@@ -54,6 +66,10 @@ def setup_application(
             readonly_engine=readonly_engine,
         ),
         auth_app=authentication_use_case,
+        certification_app=CertificationOutputAdaptor(
+            key=app_config.PORT_ONE_KEY,
+            secret=app_config.PORT_ONE_SECRET,
+        ),
     )
     user_http_application = UserHttpInputAdaptor(
         input=user_use_case,

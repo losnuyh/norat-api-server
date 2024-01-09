@@ -20,3 +20,7 @@ class UserSignupResponse(BaseModel):
     id: int = Field(title="유저 아이디")
     account: str = Field(title="유저 계정")
     birth: date = Field(title="생일 정보")
+
+
+class CertificationRequest(BaseModel):
+    imp_uid: str = Field(title="포트원 imp uid")

@@ -19,3 +19,7 @@ class UserInputPort(ABC):
     @abstractmethod
     async def check_account(self, *, account: str) -> bool:
         ...
+
+    @abstractmethod
+    async def self_certification(self, *, user_id: int, imp_uid: str):
+        ...
