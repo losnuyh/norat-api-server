@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from sqlalchemy import select
+from sqlalchemy import Select, select
 
 from application.domain.user.model import CertificationInfo, CertificationType, User
 from application.domain.user.use_case.port.output import UserStoreOutputPort
@@ -9,9 +9,8 @@ from .table import CertificationTable, UserTable
 
 
 class UserStoreAdaptor(UserStoreOutputPort):
-    async def get_user_by_account(self, *, account: str) -> User | None:
-        stmt = select(UserTable).where(UserTable.account == account)
-        user_result: UserTable = await self.session.scalar(stmt)
+    async def _get_user_table(self, select_stmt: Select) -> User | None:
+        user_result: UserTable = await self.session.scalar(select_stmt)
         if user_result is None:
             return None
         return User(
@@ -21,17 +20,17 @@ class UserStoreAdaptor(UserStoreOutputPort):
             birth=user_result.birth,
         )
 
+    async def get_user_by_account(self, *, account: str) -> User | None:
+        stmt = select(UserTable).where(UserTable.account == account)
+        return await self._get_user_table(stmt)
+
     async def get_user_by_user_id(self, *, user_id: int) -> User | None:
         stmt = select(UserTable).where(UserTable.id == user_id)
-        user_result: UserTable = await self.session.scalar(stmt)
-        if user_result is None:
-            return None
-        return User(
-            id=user_result.id,
-            account=user_result.account,
-            phone=user_result.phone,
-            birth=user_result.birth,
-        )
+        return await self._get_user_table(stmt)
+
+    async def get_user_by_phone(self, *, phone: str) -> User | None:
+        stmt = select(UserTable).where(UserTable.phone == phone)
+        return await self._get_user_table(stmt)
 
     async def save_user(self, *, user: User) -> User:
         now = datetime.now(tz=timezone.utc)

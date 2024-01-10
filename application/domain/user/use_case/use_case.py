@@ -47,18 +47,25 @@ class UserUseCase(UserInputPort):
             return user
 
     async def check_account(self, *, account: str) -> bool:
-        async with self.user_store as uow:
+        async with self.user_store(read_only=True) as uow:
             user = await uow.get_user_by_account(account=account)
             return user is not None
 
-    async def certificate_self(self, *, user_id: int, imp_uid: str):
-        """
-        1. imp_uid로 유저 정보 받아 오는 outputProt 메소드 호출
-        2. user_id로 받아온 user 정보와 비교
-        * user 정보가 만 14세가 넘어야 함
-        3. 같으면 성공 다르면 실패
-        """
+    async def get_user_by_user_id(self, *, user_id: int) -> User:
+        async with self.user_store(read_only=True) as uow:
+            user = await uow.get_user_by_user_id(user_id=user_id)
+            if user is None:
+                raise NotFound(f"user not found, {user_id=}")
+            return user
 
+    async def get_user_by_phone(self, *, phone: str) -> User:
+        async with self.user_store(read_only=True) as uow:
+            user = await uow.get_user_by_phone(phone=phone)
+            if user is None:
+                raise NotFound(f"user not found, {phone=}")
+            return user
+
+    async def certificate_self(self, *, user_id: int, imp_uid: str):
         async with self.user_store(read_only=True) as uow:
             user = await uow.get_user_by_user_id(user_id=user_id)
             if user.age < 14:

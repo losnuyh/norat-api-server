@@ -22,6 +22,10 @@ class UserStoreOutputPort(UnitOfWork, ABC):
         ...
 
     @abstractmethod
+    async def get_user_by_phone(self, *, phone: str) -> User | None:
+        ...
+
+    @abstractmethod
     async def save_user(self, *, user: User) -> User:
         ...
 

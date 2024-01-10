@@ -22,6 +22,7 @@ class UserTable(Base):
         String(30),
         nullable=False,
         kw_only=True,
+        index=True,
     )
     created_at: Mapped[datetime] = mapped_column(
         nullable=False,

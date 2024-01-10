@@ -21,6 +21,14 @@ class UserInputPort(ABC):
         ...
 
     @abstractmethod
+    async def get_user_by_user_id(self, *, user_id: int) -> User:
+        ...
+
+    @abstractmethod
+    async def get_user_by_phone(self, *, phone: str) -> User:
+        ...
+
+    @abstractmethod
     async def certificate_self(self, *, user_id: int, imp_uid: str):
         ...
 

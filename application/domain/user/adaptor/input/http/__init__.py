@@ -1,13 +1,24 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Body, Depends, Path, Query, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
 
+from application.domain.user.model import User
 from application.domain.user.use_case.port.input import UserInputPort
 from application.error import PermissionDenied
 from application.infra.fastapi import WithFastAPIRouter
-from application.infra.fastapi.auth import get_authenticated_phone, get_authenticated_user
+from application.infra.fastapi.auth import (
+    get_authenticated_phone,
+    get_authenticated_phone_or_user,
+    get_authenticated_user,
+)
 
-from .dto import CertificationRequest, CheckUserAccountDuplicationResponse, UserSignupRequest, UserSignupResponse
+from .dto import (
+    CertificationRequest,
+    CheckUserAccountDuplicationResponse,
+    UserResponse,
+    UserSignupRequest,
+    UserSignupResponse,
+)
 
 user_router = APIRouter()
 
@@ -136,3 +147,45 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
 
             await self.input.certificate_guardian(user_id=user_id, imp_uid=body.imp_uid)
             return {"message": "success"}
+
+    def get_my_info(self):
+        @user_router.post(
+            path="/me",
+            tags=["user"],
+            summary="내 정보 가져오기",
+            description="</br>".join(
+                [
+                    "????",
+                ],
+            ),
+            status_code=status.HTTP_200_OK,
+            responses={
+                status.HTTP_200_OK: {
+                    "description": "성공",
+                },
+                status.HTTP_400_BAD_REQUEST: {
+                    "description": "실패",
+                },
+            },
+        )
+        async def handler(
+            authenticated: Annotated[tuple, Depends(get_authenticated_phone_or_user)],
+        ):
+            authenticated_entity, value = authenticated
+            user: User | None = None
+            match authenticated_entity:
+                case "phone":
+                    user = await self.input.get_user_by_phone(phone=value)
+                case "user_id":
+                    user = await self.input.get_user_by_user_id(user_id=value)
+            if user is None:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="user not found",
+                )
+            assert user.id is not None
+            return UserResponse(
+                id=user.id,
+                account=user.account,
+                birth=user.birth,
+            )

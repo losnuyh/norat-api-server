@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 
 from pydantic import BaseModel, Field
 
@@ -24,3 +24,14 @@ class UserSignupResponse(BaseModel):
 
 class CertificationRequest(BaseModel):
     imp_uid: str = Field(title="포트원 imp uid")
+
+
+class UserResponse(BaseModel):
+    id: int
+    account: str
+    birth: date
+    verified_at: datetime | None = None
+    school_name: str | None = None
+    school_grade: int | None = None
+    privacy_policy_agreed_at: datetime | None = None
+    terms_policy_agreed_at: datetime | None = None

@@ -8,7 +8,7 @@ from sqlalchemy import engine_from_config, pool
 from application.domain.authentication.adaptor.output.store.table import Base as AuthenticationBase
 from application.domain.user.adaptor.output.store.table import Base as UserBase
 
-load_dotenv(".env-migration")
+load_dotenv(".env-migration", override=True)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -73,6 +73,7 @@ def run_migrations_online() -> None:
     port = environ.get("DB_PORT")
     database = environ.get("DATABASE_NAME")
     db_url = f"mysql+pymysql://{username}:{password}@{host}:{port}/{database}"
+    print(db_url)
     config.set_main_option("sqlalchemy.url", db_url)
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
