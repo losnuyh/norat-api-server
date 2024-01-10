@@ -10,7 +10,7 @@ from application.domain.user.use_case.port.output import (
     CertificationOutputPort,
     UserStoreOutputPort,
 )
-from application.error import InvalidData, NotFound
+from application.error import NotFound
 
 
 class UserUseCase(UserInputPort):
@@ -68,8 +68,6 @@ class UserUseCase(UserInputPort):
     async def certificate_self(self, *, user_id: int, imp_uid: str):
         async with self.user_store(read_only=True) as uow:
             user = await uow.get_user_by_user_id(user_id=user_id)
-            if user.age < 14:
-                raise InvalidData(f"wrong user age: {user.age=}")
             if user is None:
                 raise NotFound(f"user not exist, {user_id=}")
 
@@ -77,22 +75,19 @@ class UserUseCase(UserInputPort):
         if certification_info is None:
             raise CertificationIsWrong(f"wrong imp_uid, {imp_uid=}")
 
-        if user.birth != certification_info.birth:
-            raise CertificationIsWrong(f"not matched, {user.birth=}, {certification_info.birth=}")
-
+        user.verify_self(certification=certification_info)
         async with self.user_store() as uow:
             await uow.save_certification(
                 user_id=user_id,
                 certification_type=SELF_Certification,
                 certification=certification_info,
             )
+
             await uow.commit()
 
     async def certificate_guardian(self, *, user_id: int, imp_uid: str):
         async with self.user_store(read_only=True) as uow:
             user = await uow.get_user_by_user_id(user_id=user_id)
-            if user.age >= 14:
-                raise InvalidData(f"wrong user age: {user.age=}")
             if user is None:
                 raise NotFound(f"user not exist, {user_id=}")
 
@@ -100,8 +95,7 @@ class UserUseCase(UserInputPort):
         if certification_info is None:
             raise CertificationIsWrong(f"wrong imp_uid, {imp_uid=}")
 
-        if certification_info.age < 20:
-            raise CertificationIsWrong(f"wrong guardian age: {certification_info.age=}")
+        user.verify_guardian(certification=certification_info)
 
         async with self.user_store() as uow:
             await uow.save_certification(
