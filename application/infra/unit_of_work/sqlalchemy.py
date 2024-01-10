@@ -13,11 +13,11 @@ class UnitOfWork:
         self.engine = engine
         self.readonly_engine = readonly_engine
         self.__context_session = ContextVar("session")
-        self.__read_only = False
+        self.__context_read_only = ContextVar("read_only")
 
     async def __aenter__(self) -> Self:
-        print("db start......with ", self.__read_only)
-        if self.__read_only:
+        read_only = self.__context_read_only.get("read_only")
+        if read_only:
             session = AsyncSession(self.readonly_engine)
         else:
             session = AsyncSession(self.engine)
@@ -25,8 +25,7 @@ class UnitOfWork:
         return self
 
     def __call__(self, read_only=False):
-        print("set readonly value, with ",read_only)
-        self.__read_only = read_only
+        self.__context_read_only.set(read_only)
         return self
 
     @property
@@ -38,6 +37,7 @@ class UnitOfWork:
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         await self.session.close()
+        self.__context_read_only.set(False)
         return
 
     async def commit(self):
