@@ -24,3 +24,6 @@ class UserInputPort(ABC):
     async def certificate_self(self, *, user_id: int, imp_uid: str):
         ...
 
+    @abstractmethod
+    async def certificate_guardian(self, *, user_id: int, imp_uid: str):
+        ...

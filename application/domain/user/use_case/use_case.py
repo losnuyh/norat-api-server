@@ -3,7 +3,7 @@ from datetime import date
 from application.domain.authentication.model import UserData
 from application.domain.user.error import AccountIsDuplicated, CertificationIsWrong
 from application.domain.user.model import User
-from application.domain.user.model.certification_info import SELF_Certification
+from application.domain.user.model.certification_info import GUARDIAN_Certification, SELF_Certification
 from application.domain.user.use_case.port.input import UserInputPort
 from application.domain.user.use_case.port.output import (
     AuthenticationOutputPort,
@@ -61,8 +61,8 @@ class UserUseCase(UserInputPort):
 
         async with self.user_store(read_only=True) as uow:
             user = await uow.get_user_by_user_id(user_id=user_id)
-            if user.get_current_age() < 14:
-                raise InvalidData(f"wrong user age: {user.get_current_age()=}")
+            if user.age < 14:
+                raise InvalidData(f"wrong user age: {user.age=}")
             if user is None:
                 raise NotFound(f"user not exist, {user_id=}")
 
@@ -77,6 +77,29 @@ class UserUseCase(UserInputPort):
             await uow.save_certification(
                 user_id=user_id,
                 certification_type=SELF_Certification,
+                certification=certification_info,
+            )
+            await uow.commit()
+
+    async def certificate_guardian(self, *, user_id: int, imp_uid: str):
+        async with self.user_store(read_only=True) as uow:
+            user = await uow.get_user_by_user_id(user_id=user_id)
+            if user.age >= 14:
+                raise InvalidData(f"wrong user age: {user.age=}")
+            if user is None:
+                raise NotFound(f"user not exist, {user_id=}")
+
+        certification_info = await self.cert_app.get_certification_info(imp_uid=imp_uid)
+        if certification_info is None:
+            raise CertificationIsWrong(f"wrong imp_uid, {imp_uid=}")
+
+        if certification_info.age < 20:
+            raise CertificationIsWrong(f"wrong guardian age: {certification_info.age=}")
+
+        async with self.user_store() as uow:
+            await uow.save_certification(
+                user_id=user_id,
+                certification_type=GUARDIAN_Certification,
                 certification=certification_info,
             )
             await uow.commit()

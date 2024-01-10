@@ -69,7 +69,7 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
                 birth=user.birth,
             )
 
-    def certification(self):
+    def certificate_self(self):
         @user_router.post(
             path="/{user_id}/certification/self",
             tags=["user"],
@@ -101,4 +101,38 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
                 raise PermissionDenied("Not permitted")
 
             await self.input.certificate_self(user_id=user_id, imp_uid=body.imp_uid)
+            return {"message": "success"}
+
+    def certificate_guardian(self):
+        @user_router.post(
+            path="/{user_id}/certification/guardian",
+            tags=["user"],
+            summary="보호자 인증 완료 요청",
+            description="</br>".join(
+                [
+                    "포트원 보호자 완료 후, 인증 완료 처리를 서버에 요청합니다.",
+                    "포트원 보호자 후 받은 imp_uid를 전송합니다.",
+                    "보호자 인증인 경우에만 가능합니다.",
+                    "가입시 입력한 정보가 14세 이상인 경우에는 보호자인증 api를 호출할 수 없습니다.",
+                ],
+            ),
+            status_code=status.HTTP_200_OK,
+            responses={
+                status.HTTP_200_OK: {
+                    "description": "성공",
+                },
+                status.HTTP_400_BAD_REQUEST: {
+                    "description": "실패",
+                },
+            },
+        )
+        async def handler(
+            user_id: Annotated[int, Path()],
+            body: Annotated[CertificationRequest, Body()],
+            request_user_id: Annotated[str, Depends(get_authenticated_user)],
+        ):
+            if user_id != request_user_id:
+                raise PermissionDenied("Not permitted")
+
+            await self.input.certificate_guardian(user_id=user_id, imp_uid=body.imp_uid)
             return {"message": "success"}

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime
 from typing import NewType
 
 
@@ -10,6 +10,12 @@ class CertificationInfo:
     birth: date
     unique_key: str
     unique_in_site: str
+
+    @property
+    def age(self):
+        current_year = datetime.now().year
+        birth_year = self.birth.year
+        return current_year - birth_year
 
 
 CertificationType = NewType("CertificationType", str)
