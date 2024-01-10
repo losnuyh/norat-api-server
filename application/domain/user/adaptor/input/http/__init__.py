@@ -100,5 +100,5 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
             if user_id != request_user_id:
                 raise PermissionDenied("Not permitted")
 
-            await self.input.self_certification(user_id=user_id, imp_uid=body.imp_uid)
+            await self.input.certificate_self(user_id=user_id, imp_uid=body.imp_uid)
             return {"message": "success"}

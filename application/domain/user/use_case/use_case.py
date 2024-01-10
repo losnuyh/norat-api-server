@@ -51,7 +51,7 @@ class UserUseCase(UserInputPort):
             user = await uow.get_user_by_account(account=account)
             return user is not None
 
-    async def self_certification(self, *, user_id: int, imp_uid: str):
+    async def certificate_self(self, *, user_id: int, imp_uid: str):
         """
         1. imp_uid로 유저 정보 받아 오는 outputProt 메소드 호출
         2. user_id로 받아온 user 정보와 비교
