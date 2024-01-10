@@ -82,7 +82,7 @@ class UserUseCase(UserInputPort):
                 certification_type=SELF_Certification,
                 certification=certification_info,
             )
-
+            await uow.save_user(user=user)
             await uow.commit()
 
     async def certificate_guardian(self, *, user_id: int, imp_uid: str):

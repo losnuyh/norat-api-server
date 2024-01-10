@@ -28,6 +28,11 @@ class UserTable(Base):
         nullable=False,
         kw_only=True,
     )
+    verified_at: Mapped[datetime] = mapped_column(
+        nullable=True,
+        kw_only=True,
+        default=None,
+    )
 
 
 class CertificationTable(Base):

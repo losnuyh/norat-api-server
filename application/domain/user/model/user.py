@@ -27,7 +27,7 @@ class User:
 
         if self.birth != certification.birth:
             raise CertificationIsWrong(f"not matched, {self.birth=}, {certification.birth=}")
-        # TODO: name 저장 ?
+
         self.verified_at = datetime.now(tz=timezone.utc)
 
     def verify_guardian(self, *, certification: CertificationInfo):

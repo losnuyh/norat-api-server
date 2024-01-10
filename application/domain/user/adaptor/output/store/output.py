@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 
 from sqlalchemy import Select, select
+from sqlalchemy.dialects.mysql import insert
 
 from application.domain.user.model import CertificationInfo, CertificationType, User
 from application.domain.user.use_case.port.output import UserStoreOutputPort
@@ -18,6 +19,7 @@ class UserStoreAdaptor(UserStoreOutputPort):
             account=user_result.account,
             phone=user_result.phone,
             birth=user_result.birth,
+            verified_at=user_result.verified_at,
         )
 
     async def get_user_by_account(self, *, account: str) -> User | None:
@@ -34,15 +36,16 @@ class UserStoreAdaptor(UserStoreOutputPort):
 
     async def save_user(self, *, user: User) -> User:
         now = datetime.now(tz=timezone.utc)
-        user_row = UserTable(
+        user_row = dict(
             account=user.account,
             phone=user.phone,
             birth=user.birth,
+            verified_at=user.verified_at,
             created_at=now,
         )
-        self.session.add(user_row)
-        await self.session.flush()
-        user.id = user_row.id
+        stmt = insert(UserTable).values(**user_row).on_duplicate_key_update(**user_row)
+        result = await self.session.execute(stmt)
+        user.id, *_ = result.inserted_primary_key_rows
         return user
 
     async def save_certification(

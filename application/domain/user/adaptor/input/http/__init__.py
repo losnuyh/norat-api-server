@@ -189,4 +189,5 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
                 id=user.id,
                 account=user.account,
                 birth=user.birth,
+                verified_at=user.verified_at,
             )
