@@ -16,6 +16,7 @@ class UnitOfWork:
         self.__read_only = False
 
     async def __aenter__(self) -> Self:
+        print("db start......with ", self.__read_only)
         if self.__read_only:
             session = AsyncSession(self.readonly_engine)
         else:
@@ -24,6 +25,7 @@ class UnitOfWork:
         return self
 
     def __call__(self, read_only=False):
+        print("set readonly value, with ",read_only)
         self.__read_only = read_only
         return self
 
