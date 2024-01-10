@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncEngine
 from starlette import status
+from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 
 from application.config import app_config
 from application.domain.authentication.adaptor.input.http import AuthenticationHttpInputAdaptor, authentication_router
@@ -42,6 +43,16 @@ def setup_exception_handlers(application: FastAPI):
             content={"error": str(exc)},
         )
 
+    @application.exception_handler(InvalidTokenError)
+    @application.exception_handler(ExpiredSignatureError)
+    def handler_token_error(request: Request, exc):
+        return JSONResponse(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            content={
+                "detail": "Not authenticated",
+            },
+            headers={"WWW-Authenticated": "Bearer"},
+        )
 
 def setup_application(
     *,
