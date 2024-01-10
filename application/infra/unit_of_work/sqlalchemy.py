@@ -13,10 +13,10 @@ class UnitOfWork:
         self.engine = engine
         self.readonly_engine = readonly_engine
         self.__context_session = ContextVar("session")
-        self.__context_read_only = ContextVar("read_only")
+        self.__context_read_only = ContextVar("read_only", default=False)
 
     async def __aenter__(self) -> Self:
-        read_only = self.__context_read_only.get("read_only")
+        read_only = self.__context_read_only.get()
         if read_only:
             session = AsyncSession(self.readonly_engine)
         else:
@@ -30,10 +30,7 @@ class UnitOfWork:
 
     @property
     def session(self):
-        return self.__context_session.get("session")
-
-    def __remove_session(self):
-        self.__context_session.get("session")
+        return self.__context_session.get()
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         await self.session.close()
