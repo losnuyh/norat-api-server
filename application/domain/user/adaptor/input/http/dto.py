@@ -4,16 +4,28 @@ from pydantic import BaseModel, Field
 
 
 class CheckUserAccountDuplicationResponse(BaseModel):
-    account: str = Field(title="중복 체크 요청한 account")
+    account: str = Field(
+        title="중복 체크 요청한 account",
+        min_length=2,
+        max_length=12,
+    )
     is_exist: bool = Field(
         title="중복 여부",
     )
 
 
 class UserSignupRequest(BaseModel):
-    account: str = Field(title="유저 계정")
+    account: str = Field(
+        title="유저 계정",
+        min_length=2,
+        max_length=12,
+    )
     birth: date = Field(title="생일 정보")
-    password: str = Field(title="비밀번호")
+    password: str = Field(
+        title="비밀번호",
+        min_length=8,
+        max_length=32,
+    )
 
 
 class UserSignupResponse(BaseModel):

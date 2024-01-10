@@ -29,8 +29,16 @@ class VerifyPhoneResponse(BaseModel):
 
 
 class UserLoginRequest(BaseModel):
-    account: str = Field(title="유저 아이디")
-    password: str = Field(title="유저 비밀번호")
+    account: str = Field(
+        title="유저 아이디",
+        min_length=2,
+        max_length=12,
+    )
+    password: str = Field(
+        title="유저 비밀번호",
+        min_length=8,
+        max_length=32,
+    )
 
 
 class UserTokenResponse(BaseModel):
@@ -43,5 +51,13 @@ class UserTokenRefreshRequest(BaseModel):
 
 
 class ChangePasswordRequest(BaseModel):
-    password: str = Field(title="현재 비밀번호")
-    new_password: str = Field(title="변경할 비밀번호")
+    password: str = Field(
+        title="현재 비밀번호",
+        min_length=8,
+        max_length=32,
+    )
+    new_password: str = Field(
+        title="변경할 비밀번호",
+        min_length=8,
+        max_length=32,
+    )
