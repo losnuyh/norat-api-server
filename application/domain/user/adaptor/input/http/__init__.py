@@ -155,7 +155,8 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
             summary="내 정보 가져오기",
             description="</br>".join(
                 [
-                    "????",
+                    "내 계정 정보를 받아옵니다.",
+                    "phone token 또는 auth token으로 접근할 수 있습니다.",
                 ],
             ),
             status_code=status.HTTP_200_OK,
