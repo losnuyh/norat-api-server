@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Protocol
 
 from application.domain.authentication.model import UserData
-from application.domain.user.model import CertificationInfo, User
+from application.domain.user.model import CertificationInfo, CertificationType, User
 from application.infra.unit_of_work.sqlalchemy import UnitOfWork
 
 
@@ -23,6 +23,12 @@ class UserStoreOutputPort(UnitOfWork, ABC):
 
     @abstractmethod
     async def save_user(self, *, user: User) -> User:
+        ...
+
+    @abstractmethod
+    async def save_certification(
+        self, *, user_id: int, certification_type: CertificationType, certification: CertificationInfo
+    ):
         ...
 
 

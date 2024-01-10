@@ -3,6 +3,7 @@ from datetime import date
 from application.domain.authentication.model import UserData
 from application.domain.user.error import AccountIsDuplicated, CertificationIsWrong
 from application.domain.user.model import User
+from application.domain.user.model.certification_info import SELF_Certification
 from application.domain.user.use_case.port.input import UserInputPort
 from application.domain.user.use_case.port.output import (
     AuthenticationOutputPort,
@@ -65,10 +66,17 @@ class UserUseCase(UserInputPort):
             if user is None:
                 raise NotFound(f"user not exist, {user_id=}")
 
-            certification_info = await self.cert_app.get_certification_info(imp_uid=imp_uid)
-            if certification_info is None:
-                raise CertificationIsWrong(f"wrong imp_uid, {imp_uid=}")
-            ...
+        certification_info = await self.cert_app.get_certification_info(imp_uid=imp_uid)
+        if certification_info is None:
+            raise CertificationIsWrong(f"wrong imp_uid, {imp_uid=}")
 
-            if user.birth != certification_info.birth:
-                raise CertificationIsWrong(f"not matched, {user.birth=}, {certification_info.birth=}")
+        if user.birth != certification_info.birth:
+            raise CertificationIsWrong(f"not matched, {user.birth=}, {certification_info.birth=}")
+
+        async with self.user_store() as uow:
+            await uow.save_certification(
+                user_id=user_id,
+                certification_type=SELF_Certification,
+                certification=certification_info,
+            )
+            await uow.commit()

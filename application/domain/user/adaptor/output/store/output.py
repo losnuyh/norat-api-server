@@ -2,10 +2,10 @@ from datetime import datetime, timezone
 
 from sqlalchemy import select
 
-from application.domain.user.model.user import User
+from application.domain.user.model import CertificationInfo, CertificationType, User
 from application.domain.user.use_case.port.output import UserStoreOutputPort
 
-from .table import UserTable
+from .table import CertificationTable, UserTable
 
 
 class UserStoreAdaptor(UserStoreOutputPort):
@@ -45,3 +45,23 @@ class UserStoreAdaptor(UserStoreOutputPort):
         await self.session.flush()
         user.id = user_row.id
         return user
+
+    async def save_certification(
+        self,
+        *,
+        user_id: int,
+        certification_type: CertificationType,
+        certification: CertificationInfo,
+    ):
+        now = datetime.now(tz=timezone.utc)
+        cert_row = CertificationTable(
+            user_id=user_id,
+            certification_type=certification_type,
+            name=certification.name,
+            gender=certification.gender,
+            birth=certification.birth,
+            unique_key=certification.unique_key,
+            unique_in_site=certification.unique_in_site,
+            created_at=now,
+        )
+        self.session.add(cert_row)

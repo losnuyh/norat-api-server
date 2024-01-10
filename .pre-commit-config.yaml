@@ -48,5 +48,4 @@ repos:
   hooks:
   - id: mypy
     additional_dependencies:
-    - types-requests
     - pydantic == 2.3.0
