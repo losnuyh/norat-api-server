@@ -1,6 +1,5 @@
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING
-from uuid import uuid4
 
 from application.domain.user.model.vo import PreSignedUrl
 from application.domain.user.use_case.port.output import UserS3OutputPort
@@ -16,7 +15,7 @@ class UserS3OutputAdaptor(UserS3OutputPort):
 
     async def make_face_upload_pre_signed_url(self, *, user_id: int) -> PreSignedUrl:
         now = datetime.now(tz=timezone.utc)
-        key = f"face_verification/{now.year}/{now.month}/{now.day}/{uuid4()}/{user_id}/video.mp4"
+        key = f"face_verification/{now.year}/{now.month}/{now.day}/{user_id}/{int(now.timestamp()*10)}-video.mp4"
         url = self.s3_client.generate_presigned_url(
             ClientMethod="put_object",
             Params={
