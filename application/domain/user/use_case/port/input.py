@@ -35,3 +35,7 @@ class UserInputPort(ABC):
     @abstractmethod
     async def certificate_guardian(self, *, user_id: int, imp_uid: str):
         ...
+
+    @abstractmethod
+    async def agree_terms(self, *, user_id: int, agree_marketing: bool, agree_push: bool):
+        ...

@@ -13,6 +13,7 @@ from application.infra.fastapi.auth import (
 )
 
 from .dto import (
+    AgreeTermsRequest,
     CertificationRequest,
     CheckUserAccountDuplicationResponse,
     UserResponse,
@@ -190,4 +191,45 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
                 account=user.account,
                 birth=user.birth,
                 verified_at=user.verified_at,
+                privacy_policy_agreed_at=user.privacy_policy_agreed_at,
+                terms_policy_agreed_at=user.service_policy_agreed_at,
+                marketing_policy_agreed_at=user.marketing_policy_agreed_at,
+                push_agreed_at=user.push_agreed_at,
             )
+
+    def agree_terms(self):
+        @user_router.post(
+            path="/{user_id}/terms",
+            tags=["user", "terms"],
+            summary="약관 동의하기",
+            description="</br>".join(
+                [
+                    "약관 동의 정보를 기록합니다.",
+                    "선택 약관 정보만 받습니다. 필수 약관은 요청 시점으로 동의로 간주합니다.",
+                    "선택 약관은 false <-> true로 변경할 수 있습니다.",
+                ],
+            ),
+            status_code=status.HTTP_200_OK,
+            responses={
+                status.HTTP_200_OK: {
+                    "description": "성공",
+                },
+                status.HTTP_400_BAD_REQUEST: {
+                    "description": "실패",
+                },
+            },
+        )
+        async def handler(
+            user_id: Annotated[int, Path()],
+            body: Annotated[AgreeTermsRequest, Body()],
+            request_user_id: Annotated[str, Depends(get_authenticated_user)],
+        ):
+            if user_id != request_user_id:
+                raise PermissionDenied("Not permitted")
+
+            await self.input.agree_terms(
+                user_id=user_id,
+                agree_marketing=body.marketing,
+                agree_push=body.push,
+            )
+            return {"message": "success"}

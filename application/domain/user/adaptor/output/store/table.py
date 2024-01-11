@@ -33,6 +33,26 @@ class UserTable(Base):
         kw_only=True,
         default=None,
     )
+    privacy_policy_agreed_at: Mapped[datetime] = mapped_column(
+        nullable=True,
+        kw_only=True,
+        default=None,
+    )
+    service_policy_agreed_at: Mapped[datetime] = mapped_column(
+        nullable=True,
+        kw_only=True,
+        default=None,
+    )
+    marketing_policy_agreed_at: Mapped[datetime] = mapped_column(
+        nullable=True,
+        kw_only=True,
+        default=None,
+    )
+    push_agreed_at: Mapped[datetime] = mapped_column(
+        nullable=True,
+        kw_only=True,
+        default=None,
+    )
 
 
 class CertificationTable(Base):

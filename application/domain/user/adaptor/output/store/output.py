@@ -19,7 +19,26 @@ class UserStoreAdaptor(UserStoreOutputPort):
             account=user_result.account,
             phone=user_result.phone,
             birth=user_result.birth,
-            verified_at=user_result.verified_at,
+            verified_at=user_result.verified_at
+            and user_result.verified_at.replace(
+                tzinfo=timezone.utc,
+            ),
+            privacy_policy_agreed_at=user_result.privacy_policy_agreed_at
+            and user_result.privacy_policy_agreed_at.replace(
+                tzinfo=timezone.utc,
+            ),
+            service_policy_agreed_at=user_result.service_policy_agreed_at
+            and user_result.service_policy_agreed_at.replace(
+                tzinfo=timezone.utc,
+            ),
+            marketing_policy_agreed_at=user_result.marketing_policy_agreed_at
+            and user_result.marketing_policy_agreed_at.replace(
+                tzinfo=timezone.utc,
+            ),
+            push_agreed_at=user_result.push_agreed_at
+            and user_result.push_agreed_at.replace(
+                tzinfo=timezone.utc,
+            ),
         )
 
     async def get_user_by_account(self, *, account: str) -> User | None:
@@ -37,15 +56,20 @@ class UserStoreAdaptor(UserStoreOutputPort):
     async def save_user(self, *, user: User) -> User:
         now = datetime.now(tz=timezone.utc)
         user_row = dict(
+            id=user.id,
             account=user.account,
             phone=user.phone,
             birth=user.birth,
             verified_at=user.verified_at,
             created_at=now,
+            privacy_policy_agreed_at=user.privacy_policy_agreed_at,
+            service_policy_agreed_at=user.service_policy_agreed_at,
+            marketing_policy_agreed_at=user.marketing_policy_agreed_at,
+            push_agreed_at=user.push_agreed_at,
         )
         stmt = insert(UserTable).values(**user_row).on_duplicate_key_update(**user_row)
         result = await self.session.execute(stmt)
-        user.id, *_ = result.inserted_primary_key_rows
+        user.id, *_ = result.inserted_primary_key_rows[0]
         return user
 
     async def save_certification(

@@ -45,5 +45,13 @@ class UserResponse(BaseModel):
     verified_at: datetime | None = None
     school_name: str | None = None
     school_grade: int | None = None
+
     privacy_policy_agreed_at: datetime | None = None
     terms_policy_agreed_at: datetime | None = None
+    marketing_policy_agreed_at: datetime | None = None
+    push_agreed_at: datetime | None = None
+
+
+class AgreeTermsRequest(BaseModel):
+    marketing: bool = Field(title="마케팅 동의")
+    push: bool = Field(title="푸시 동의")

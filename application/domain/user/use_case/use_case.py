@@ -104,3 +104,22 @@ class UserUseCase(UserInputPort):
                 certification=certification_info,
             )
             await uow.commit()
+
+    async def agree_terms(self, *, user_id: int, agree_marketing: bool, agree_push: bool):
+        async with self.user_store() as uow:
+            user = await uow.get_user_by_user_id(user_id=user_id)
+            if user is None:
+                raise NotFound(f"user not exist, {user_id=}")
+
+            user.agree_service_policy()
+            user.agree_privacy_policy()
+            if agree_marketing:
+                user.agree_marketing_policy()
+            else:
+                user.disagree_marketing_policy()
+            if agree_push:
+                user.agree_push()
+            else:
+                user.disagree_push()
+            await uow.save_user(user=user)
+            await uow.commit()

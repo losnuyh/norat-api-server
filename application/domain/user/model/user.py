@@ -15,6 +15,11 @@ class User:
     birth: date
     verified_at: datetime | None = None
 
+    privacy_policy_agreed_at: datetime | None = None
+    service_policy_agreed_at: datetime | None = None
+    marketing_policy_agreed_at: datetime | None = None
+    push_agreed_at: datetime | None = None
+
     @property
     def age(self):
         current_year = datetime.now().year
@@ -37,3 +42,27 @@ class User:
         if certification.age < 20:
             raise CertificationIsWrong(f"wrong guardian age: {certification.age=}")
         self.verified_at = datetime.now(tz=timezone.utc)
+
+    def agree_privacy_policy(self):
+        if self.privacy_policy_agreed_at is None:
+            self.privacy_policy_agreed_at = datetime.now(tz=timezone.utc)
+
+    def agree_service_policy(self):
+        if self.service_policy_agreed_at is None:
+            self.service_policy_agreed_at = datetime.now(tz=timezone.utc)
+
+    def agree_marketing_policy(self):
+        if self.marketing_policy_agreed_at is None:
+            self.marketing_policy_agreed_at = datetime.now(tz=timezone.utc)
+
+    def disagree_marketing_policy(self):
+        if self.marketing_policy_agreed_at is not None:
+            self.marketing_policy_agreed_at = None
+
+    def agree_push(self):
+        if self.push_agreed_at is None:
+            self.push_agreed_at = datetime.now(tz=timezone.utc)
+
+    def disagree_push(self):
+        if self.push_agreed_at is not None:
+            self.push_agreed_at = None
