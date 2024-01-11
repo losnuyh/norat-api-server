@@ -8,7 +8,7 @@ from sqlalchemy import engine_from_config, pool
 from application.domain.authentication.adaptor.output.store.table import Base as AuthenticationBase
 from application.domain.user.adaptor.output.store.table import Base as UserBase
 
-load_dotenv(".env-migration", override=True)
+load_dotenv(".env-migration-dev", override=True)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

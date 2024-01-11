@@ -1,10 +1,12 @@
 from datetime import datetime, timezone
+from typing import TYPE_CHECKING
 from uuid import uuid4
-
-from mypy_boto3_s3 import S3Client
 
 from application.domain.user.model.vo import PreSignedUrl
 from application.domain.user.use_case.port.output import UserS3OutputPort
+
+if TYPE_CHECKING:
+    from mypy_boto3_s3 import S3Client
 
 
 class UserS3OutputAdaptor(UserS3OutputPort):
