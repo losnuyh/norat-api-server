@@ -45,7 +45,9 @@ class AuthenticationStoreAdaptor(AuthenticationStoreOutputPort):
         await self.session.execute(stmt)
 
     async def get_user_password_authenticator_by_user_id(self, *, user_id: int) -> PasswordAuthenticator | None:
-        stmt = select(PasswordAuthenticatorTable).where(PasswordAuthenticatorTable.user_id == user_id)
+        stmt = select(PasswordAuthenticatorTable).where(
+            PasswordAuthenticatorTable.user_id == user_id
+        ).order_by(PasswordAuthenticatorTable.id.desc())
         data: PasswordAuthenticatorTable = await self.session.scalar(stmt)
         if data is None:
             return None
@@ -59,7 +61,9 @@ class AuthenticationStoreAdaptor(AuthenticationStoreOutputPort):
         )
 
     async def get_user_password_authenticator_by_user_account(self, *, account: str) -> PasswordAuthenticator | None:
-        stmt = select(PasswordAuthenticatorTable).where(PasswordAuthenticatorTable.user_account == account)
+        stmt = select(PasswordAuthenticatorTable).where(
+            PasswordAuthenticatorTable.user_account == account
+        ).order_by(PasswordAuthenticatorTable.id.desc())
         data: PasswordAuthenticatorTable = await self.session.scalar(stmt)
         if data is None:
             return None
