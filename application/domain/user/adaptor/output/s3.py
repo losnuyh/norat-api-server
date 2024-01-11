@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 
 class UserS3OutputAdaptor(UserS3OutputPort):
-    def __init__(self, *, s3_client: S3Client, bucket_name: str):
+    def __init__(self, *, s3_client: "S3Client", bucket_name: str):
         self.s3_client = s3_client
         self.bucket_name = bucket_name
 
