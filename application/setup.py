@@ -1,8 +1,9 @@
+import boto3
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 from sqlalchemy.ext.asyncio import AsyncEngine
 from starlette import status
-from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 
 from application.config import app_config
 from application.domain.authentication.adaptor.input.http import AuthenticationHttpInputAdaptor, authentication_router
@@ -15,6 +16,7 @@ from application.domain.school_board.adaptor.output import SchoolSearchOutputAda
 from application.domain.school_board.use_case import SchoolBoardUseCase
 from application.domain.user.adaptor.input.http import UserHttpInputAdaptor, user_router
 from application.domain.user.adaptor.output.certification import CertificationOutputAdaptor
+from application.domain.user.adaptor.output.s3 import UserS3OutputAdaptor
 from application.domain.user.adaptor.output.store import UserStoreAdaptor
 from application.domain.user.error import AccountIsDuplicated, CertificationIsWrong
 from application.domain.user.use_case import UserUseCase
@@ -54,6 +56,7 @@ def setup_exception_handlers(application: FastAPI):
             headers={"WWW-Authenticated": "Bearer"},
         )
 
+
 def setup_application(
     *,
     app: FastAPI,
@@ -80,6 +83,10 @@ def setup_application(
         certification_app=CertificationOutputAdaptor(
             key=app_config.PORT_ONE_KEY,
             secret=app_config.PORT_ONE_SECRET,
+        ),
+        s3_app=UserS3OutputAdaptor(
+            s3_client=boto3.client("s3"),
+            bucket_name=app_config.USER_UPLOAD_S3_BUCKET_NAME,
         ),
     )
     user_http_application = UserHttpInputAdaptor(

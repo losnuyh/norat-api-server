@@ -16,6 +16,7 @@ from .dto import (
     AgreeTermsRequest,
     CertificationRequest,
     CheckUserAccountDuplicationResponse,
+    PreSignedUrlResponse,
     UserResponse,
     UserSignupRequest,
     UserSignupResponse,
@@ -233,3 +234,38 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
                 agree_push=body.push,
             )
             return {"message": "success"}
+
+    def get_face_verification_pre_signed_url(self):
+        @user_router.get(
+            path="/{user_id}/face-verification/pre-signed-url",
+            tags=["user"],
+            summary="얼굴 인증 동영상 업로드용 url 획득",
+            description="</br>".join(
+                [
+                    "얼굴 인증 동영상 업로드용 url 획득",
+                ],
+            ),
+            status_code=status.HTTP_200_OK,
+            responses={
+                status.HTTP_200_OK: {
+                    "description": "성공",
+                },
+                status.HTTP_400_BAD_REQUEST: {
+                    "description": "실패",
+                },
+            },
+        )
+        async def handler(
+            user_id: Annotated[int, Path()],
+            request_user_id: Annotated[str, Depends(get_authenticated_user)],
+        ):
+            if user_id != request_user_id:
+                raise PermissionDenied("Not permitted")
+
+            result = await self.input.get_face_video_upload_url(
+                user_id=user_id,
+            )
+            return PreSignedUrlResponse(
+                pre_signed_url=result.pre_signed_url,
+                key=result.key,
+            )

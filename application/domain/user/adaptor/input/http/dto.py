@@ -55,3 +55,8 @@ class UserResponse(BaseModel):
 class AgreeTermsRequest(BaseModel):
     marketing: bool = Field(title="마케팅 동의")
     push: bool = Field(title="푸시 동의")
+
+
+class PreSignedUrlResponse(BaseModel):
+    pre_signed_url: str = Field(title="pre signed url")
+    key: str = Field(title="s3 키")

@@ -4,10 +4,12 @@ from application.domain.authentication.model import UserData
 from application.domain.user.error import AccountIsDuplicated, CertificationIsWrong
 from application.domain.user.model import User
 from application.domain.user.model.certification_info import GUARDIAN_Certification, SELF_Certification
+from application.domain.user.model.vo import PreSignedUrl
 from application.domain.user.use_case.port.input import UserInputPort
 from application.domain.user.use_case.port.output import (
     AuthenticationOutputPort,
     CertificationOutputPort,
+    UserS3OutputPort,
     UserStoreOutputPort,
 )
 from application.error import NotFound
@@ -20,10 +22,12 @@ class UserUseCase(UserInputPort):
         user_store: UserStoreOutputPort,
         auth_app: AuthenticationOutputPort,
         certification_app: CertificationOutputPort,
+        s3_app: UserS3OutputPort,
     ):
         self.user_store = user_store
         self.auth_app = auth_app
         self.cert_app = certification_app
+        self.s3_app = s3_app
 
     async def create_user_with_password(
         self,
@@ -123,3 +127,11 @@ class UserUseCase(UserInputPort):
                 user.disagree_push()
             await uow.save_user(user=user)
             await uow.commit()
+
+    async def get_face_video_upload_url(self, *, user_id: int) -> PreSignedUrl:
+        async with self.user_store(read_only=True) as uow:
+            user = await uow.get_user_by_user_id(user_id=user_id)
+            if user is None:
+                raise NotFound(f"user not exist, {user_id=}")
+
+            return await self.s3_app.make_face_upload_pre_signed_url(user_id=user_id)

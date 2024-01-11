@@ -273,17 +273,18 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "boto3-stubs"
-version = "1.34.11"
-description = "Type annotations for boto3 1.34.11 generated with mypy-boto3-builder 7.23.0"
+version = "1.34.16"
+description = "Type annotations for boto3 1.34.16 generated with mypy-boto3-builder 7.23.1"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "boto3-stubs-1.34.11.tar.gz", hash = "sha256:184f0dbc901baff1f5b252218d57fbca5b75521c0641ad9a4d7fa34aa20cfb7a"},
-    {file = "boto3_stubs-1.34.11-py3-none-any.whl", hash = "sha256:7fe6acc350bc103d6a500828180b1696fb897ab45cf36c16ac4ed33a9c36a9e0"},
+    {file = "boto3-stubs-1.34.16.tar.gz", hash = "sha256:0e44f92ea9172767ee6dbc3a92fd21f37fff732aa85cc571ba7213cf997c5f34"},
+    {file = "boto3_stubs-1.34.16-py3-none-any.whl", hash = "sha256:674a1fa4b2803e75e860a4fec37ee5bfd3d43365556a0972d306961bc83e0a13"},
 ]
 
 [package.dependencies]
 botocore-stubs = "*"
+mypy-boto3-s3 = {version = ">=1.34.0,<1.35.0", optional = true, markers = "extra == \"s3\""}
 mypy-boto3-ssm = {version = ">=1.34.0,<1.35.0", optional = true, markers = "extra == \"ssm\""}
 types-s3transfer = "*"
 typing-extensions = {version = ">=4.1.0", markers = "python_version < \"3.12\""}
@@ -330,7 +331,7 @@ bedrock-agent = ["mypy-boto3-bedrock-agent (>=1.34.0,<1.35.0)"]
 bedrock-agent-runtime = ["mypy-boto3-bedrock-agent-runtime (>=1.34.0,<1.35.0)"]
 bedrock-runtime = ["mypy-boto3-bedrock-runtime (>=1.34.0,<1.35.0)"]
 billingconductor = ["mypy-boto3-billingconductor (>=1.34.0,<1.35.0)"]
-boto3 = ["boto3 (==1.34.11)", "botocore (==1.34.11)"]
+boto3 = ["boto3 (==1.34.16)", "botocore (==1.34.16)"]
 braket = ["mypy-boto3-braket (>=1.34.0,<1.35.0)"]
 budgets = ["mypy-boto3-budgets (>=1.34.0,<1.35.0)"]
 ce = ["mypy-boto3-ce (>=1.34.0,<1.35.0)"]
@@ -1450,6 +1451,20 @@ mypyc = ["setuptools (>=50)"]
 reports = ["lxml"]
 
 [[package]]
+name = "mypy-boto3-s3"
+version = "1.34.14"
+description = "Type annotations for boto3.S3 1.34.14 service generated with mypy-boto3-builder 7.21.0"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "mypy-boto3-s3-1.34.14.tar.gz", hash = "sha256:71c39ab0623cdb442d225b71c1783f6a513cff4c4a13505a2efbb2e3aff2e965"},
+    {file = "mypy_boto3_s3-1.34.14-py3-none-any.whl", hash = "sha256:f9669ecd182d5bf3532f5f2dcc5e5237776afe157ad5a0b37b26d6bec5fcc432"},
+]
+
+[package.dependencies]
+typing-extensions = {version = ">=4.1.0", markers = "python_version < \"3.12\""}
+
+[[package]]
 name = "mypy-boto3-ssm"
 version = "1.34.0"
 description = "Type annotations for boto3.SSM 1.34.0 service generated with mypy-boto3-builder 7.21.0"
@@ -2323,4 +2338,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "d5d3a0a4a1734fc3b5df909faae77bb5a199c7fe63f2ea08ed4f94826ccd9d6e"
+content-hash = "247b8d234b8cfda4cda3191f5ec971fb69c566493114cff5284dbf242b5b019c"

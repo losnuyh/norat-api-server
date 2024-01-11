@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from datetime import date
 
 from application.domain.user.model import User
+from application.domain.user.model.vo import PreSignedUrl
 
 
 class UserInputPort(ABC):
@@ -38,4 +39,8 @@ class UserInputPort(ABC):
 
     @abstractmethod
     async def agree_terms(self, *, user_id: int, agree_marketing: bool, agree_push: bool):
+        ...
+
+    @abstractmethod
+    async def get_face_video_upload_url(self, *, user_id: int) -> PreSignedUrl:
         ...

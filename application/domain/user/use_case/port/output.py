@@ -3,7 +3,14 @@ from typing import Protocol
 
 from application.domain.authentication.model import UserData
 from application.domain.user.model import CertificationInfo, CertificationType, User
+from application.domain.user.model.vo import PreSignedUrl
 from application.infra.unit_of_work.sqlalchemy import UnitOfWork
+
+
+class UserS3OutputPort(ABC):
+    @abstractmethod
+    async def make_face_upload_pre_signed_url(self, *, user_id: int) -> PreSignedUrl:
+        ...
 
 
 class CertificationOutputPort(ABC):

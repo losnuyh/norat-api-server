@@ -24,3 +24,5 @@ class ApplicationConfigScheme:
 
     PORT_ONE_KEY: str
     PORT_ONE_SECRET: str
+
+    USER_UPLOAD_S3_BUCKET_NAME: str
