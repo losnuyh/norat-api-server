@@ -60,3 +60,7 @@ class AgreeTermsRequest(BaseModel):
 class PreSignedUrlResponse(BaseModel):
     pre_signed_url: str = Field(title="pre signed url")
     key: str = Field(title="s3 키")
+
+
+class RequestFaceVerificationRequest(BaseModel):
+    key: str = Field(title="s3 키")

@@ -44,3 +44,7 @@ class UserInputPort(ABC):
     @abstractmethod
     async def get_face_video_upload_url(self, *, user_id: int) -> PreSignedUrl:
         ...
+
+    @abstractmethod
+    async def request_verifying_face(self, *, user_id: int, face_vide_s3_key: str):
+        ...

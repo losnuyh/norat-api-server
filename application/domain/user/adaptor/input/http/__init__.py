@@ -17,6 +17,7 @@ from .dto import (
     CertificationRequest,
     CheckUserAccountDuplicationResponse,
     PreSignedUrlResponse,
+    RequestFaceVerificationRequest,
     UserResponse,
     UserSignupRequest,
     UserSignupResponse,
@@ -269,3 +270,39 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
                 pre_signed_url=result.pre_signed_url,
                 key=result.key,
             )
+
+    def request_face_verification(self):
+        @user_router.post(
+            path="/{user_id}/face-verification",
+            tags=["user"],
+            summary="얼굴 인증 요청",
+            description="</br>".join(
+                [
+                    "얼굴 영상을 업로드한 이후 업로드한 영상의 s3 key와 함께 얼굴 인증을 요청합니다.",
+                ],
+            ),
+            status_code=status.HTTP_200_OK,
+            responses={
+                status.HTTP_200_OK: {
+                    "description": "성공",
+                },
+                status.HTTP_400_BAD_REQUEST: {
+                    "description": "실패",
+                },
+            },
+        )
+        async def handler(
+            user_id: Annotated[int, Path()],
+            request_user_id: Annotated[str, Depends(get_authenticated_user)],
+            body: Annotated[RequestFaceVerificationRequest, Body()],
+        ):
+            if user_id != request_user_id:
+                raise PermissionDenied("Not permitted")
+
+            await self.input.request_verifying_face(
+                user_id=user_id,
+                face_vide_s3_key=body.key,
+            )
+            return {
+                "message": "success",
+            }

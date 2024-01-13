@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Protocol
 
 from application.domain.authentication.model import UserData
-from application.domain.user.model import CertificationInfo, CertificationType, User
+from application.domain.user.model import CertificationInfo, CertificationType, FaceVerificationRequest, User
 from application.domain.user.model.vo import PreSignedUrl
 from application.infra.unit_of_work.sqlalchemy import UnitOfWork
 
@@ -40,6 +40,10 @@ class UserStoreOutputPort(UnitOfWork, ABC):
     async def save_certification(
         self, *, user_id: int, certification_type: CertificationType, certification: CertificationInfo
     ):
+        ...
+
+    @abstractmethod
+    async def save_face_verification_request(self, *, face_verification_request: FaceVerificationRequest):
         ...
 
 

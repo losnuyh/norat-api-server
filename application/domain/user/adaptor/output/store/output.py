@@ -3,10 +3,10 @@ from datetime import datetime, timezone
 from sqlalchemy import Select, select
 from sqlalchemy.dialects.mysql import insert
 
-from application.domain.user.model import CertificationInfo, CertificationType, User
+from application.domain.user.model import CertificationInfo, CertificationType, FaceVerificationRequest, User
 from application.domain.user.use_case.port.output import UserStoreOutputPort
 
-from .table import CertificationTable, UserTable
+from .table import CertificationTable, FaceVerificationRequestTable, UserTable
 
 
 class UserStoreAdaptor(UserStoreOutputPort):
@@ -91,3 +91,23 @@ class UserStoreAdaptor(UserStoreOutputPort):
             created_at=now,
         )
         self.session.add(cert_row)
+
+    async def save_face_verification_request(self, *, face_verification_request: FaceVerificationRequest):
+        now = datetime.now(tz=timezone.utc)
+        values = dict(
+            user_id=face_verification_request.user_id,
+            s3_key=face_verification_request.s3_key,
+            status=face_verification_request.status,
+            changed_at=face_verification_request.changed_at,
+        )
+        stmt = (
+            insert(FaceVerificationRequestTable)
+            .values(
+                id=face_verification_request.id,
+                requested_at=now,
+                **values,
+            )
+            .on_duplicate_key_update(**values)
+        )
+        result = await self.session.execute(stmt)
+        face_verification_request.id, *_ = result.inserted_primary_key_rows[0]

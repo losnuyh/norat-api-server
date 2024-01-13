@@ -135,3 +135,16 @@ class UserUseCase(UserInputPort):
                 raise NotFound(f"user not exist, {user_id=}")
 
             return await self.s3_app.make_face_upload_pre_signed_url(user_id=user_id)
+
+    async def request_verifying_face(self, *, user_id: int, face_vide_s3_key: str):
+        async with self.user_store() as uow:
+            user = await uow.get_user_by_user_id(user_id=user_id)
+            if user is None:
+                raise NotFound(f"user not exist, {user_id=}")
+
+            # TODO: 기존에 진행중인 얼굴인증 요청이 있다면 새로 생성하지 못하도록 변경
+            request = user.request_face_verification(
+                face_video_s3_key=face_vide_s3_key,
+            )
+            await uow.save_face_verification_request(face_verification_request=request)
+            await uow.commit()

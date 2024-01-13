@@ -1,10 +1,11 @@
 from dataclasses import dataclass
 from datetime import date, datetime, timezone
 
-from application.domain.user.error import CertificationIsWrong
+from application.domain.user.error import AlreadyFaceVerified, CertificationIsWrong
 from application.error import InvalidData
 
 from .certification_info import CertificationInfo
+from .face_verification_request import FaceVerificationRequest, FaceVerificationStatus
 
 
 @dataclass(kw_only=True)
@@ -13,12 +14,15 @@ class User:
     account: str
     phone: str
     birth: date
+
     verified_at: datetime | None = None
 
     privacy_policy_agreed_at: datetime | None = None
     service_policy_agreed_at: datetime | None = None
     marketing_policy_agreed_at: datetime | None = None
     push_agreed_at: datetime | None = None
+
+    face_verified_at: datetime | None = None
 
     @property
     def age(self):
@@ -66,3 +70,16 @@ class User:
     def disagree_push(self):
         if self.push_agreed_at is not None:
             self.push_agreed_at = None
+
+    def request_face_verification(self, *, face_video_s3_key: str) -> FaceVerificationRequest:
+        if self.face_verified_at is not None:
+            raise AlreadyFaceVerified(f"user_id={self.id} already face verified")
+        now = datetime.now(tz=timezone.utc)
+        assert self.id is not None
+        return FaceVerificationRequest(
+            user_id=self.id,
+            s3_key=face_video_s3_key,
+            status=FaceVerificationStatus.IN_PROGRESS,
+            requested_at=now,
+            changed_at=now,
+        )
