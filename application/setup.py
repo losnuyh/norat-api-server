@@ -18,7 +18,12 @@ from application.domain.user.adaptor.input.http import UserHttpInputAdaptor, use
 from application.domain.user.adaptor.output.certification import CertificationOutputAdaptor
 from application.domain.user.adaptor.output.s3 import UserS3OutputAdaptor
 from application.domain.user.adaptor.output.store import UserStoreAdaptor
-from application.domain.user.error import AccountIsDuplicated, AlreadyFaceVerified, CertificationIsWrong
+from application.domain.user.error import (
+    AccountIsDuplicated,
+    AlreadyFaceVerified,
+    CertificationIsWrong,
+    FaceVerificationFail,
+)
 from application.domain.user.use_case import UserUseCase
 from application.error import InvalidData, NotFound, PermissionDenied
 from application.infra.sms import SMSSender
@@ -33,6 +38,7 @@ def setup_exception_handlers(application: FastAPI):
     @application.exception_handler(CertificationIsWrong)
     @application.exception_handler(InvalidData)
     @application.exception_handler(AlreadyFaceVerified)
+    @application.exception_handler(FaceVerificationFail)
     def handle_bad_request(request: Request, exc: AuthenticationFail):
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,

@@ -46,6 +46,10 @@ class UserStoreOutputPort(UnitOfWork, ABC):
     async def save_face_verification_request(self, *, face_verification_request: FaceVerificationRequest):
         ...
 
+    @abstractmethod
+    async def get_user_last_face_verification_request(self, *, user_id: int) -> FaceVerificationRequest | None:
+        ...
+
 
 class AuthenticationOutputPort(Protocol):
     async def create_user_password_authenticator(self, *, user_data: UserData, password: str):

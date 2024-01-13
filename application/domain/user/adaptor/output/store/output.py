@@ -111,3 +111,22 @@ class UserStoreAdaptor(UserStoreOutputPort):
         )
         result = await self.session.execute(stmt)
         face_verification_request.id, *_ = result.inserted_primary_key_rows[0]
+
+    async def get_user_last_face_verification_request(self, *, user_id: int) -> FaceVerificationRequest | None:
+        stmt = (
+            select(FaceVerificationRequestTable)
+            .where(FaceVerificationRequestTable.user_id == user_id)
+            .order_by(-FaceVerificationRequestTable.id)
+            .limit(1)
+        )
+        data: FaceVerificationRequestTable = await self.session.scalar(stmt)
+        if data is None:
+            return None
+        return FaceVerificationRequest(
+            id=data.id,
+            user_id=data.user_id,
+            s3_key=data.s3_key,
+            status=data.status,
+            requested_at=data.requested_at,
+            changed_at=data.changed_at,
+        )

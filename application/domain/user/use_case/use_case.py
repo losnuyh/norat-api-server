@@ -1,8 +1,8 @@
 from datetime import date
 
 from application.domain.authentication.model import UserData
-from application.domain.user.error import AccountIsDuplicated, CertificationIsWrong
-from application.domain.user.model import User
+from application.domain.user.error import AccountIsDuplicated, CertificationIsWrong, FaceVerificationFail
+from application.domain.user.model import FaceVerificationStatus, User
 from application.domain.user.model.certification_info import GUARDIAN_Certification, SELF_Certification
 from application.domain.user.model.vo import PreSignedUrl
 from application.domain.user.use_case.port.input import UserInputPort
@@ -142,9 +142,12 @@ class UserUseCase(UserInputPort):
             if user is None:
                 raise NotFound(f"user not exist, {user_id=}")
 
-            # TODO: 기존에 진행중인 얼굴인증 요청이 있다면 새로 생성하지 못하도록 변경
-            request = user.request_face_verification(
+            exist_request = await uow.get_user_last_face_verification_request(user_id=user_id)
+            if exist_request and exist_request.status != FaceVerificationStatus.REJECTED:
+                raise FaceVerificationFail(f"exist another face verification (is {exist_request.status})")
+
+            new_request = user.request_face_verification(
                 face_video_s3_key=face_vide_s3_key,
             )
-            await uow.save_face_verification_request(face_verification_request=request)
+            await uow.save_face_verification_request(face_verification_request=new_request)
             await uow.commit()
