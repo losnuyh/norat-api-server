@@ -2,7 +2,7 @@ from datetime import date
 
 from application.domain.authentication.model import UserData
 from application.domain.user.error import AccountIsDuplicated, CertificationIsWrong, FaceVerificationFail
-from application.domain.user.model import FaceVerificationStatus, User
+from application.domain.user.model import FaceVerificationRequest, FaceVerificationStatus, User
 from application.domain.user.model.certification_info import GUARDIAN_Certification, SELF_Certification
 from application.domain.user.model.vo import PreSignedUrl
 from application.domain.user.use_case.port.input import UserInputPort
@@ -151,3 +151,14 @@ class UserUseCase(UserInputPort):
             )
             await uow.save_face_verification_request(face_verification_request=new_request)
             await uow.commit()
+
+    async def get_user_last_face_verification(self, *, user_id: int) -> FaceVerificationRequest:
+        async with self.user_store(read_only=True) as uow:
+            user = await uow.get_user_by_user_id(user_id=user_id)
+            if user is None:
+                raise NotFound(f"user not exist, {user_id=}")
+
+            last_request = await uow.get_user_last_face_verification_request(user_id=user_id)
+            if not last_request:
+                raise NotFound("request not found")
+            return last_request

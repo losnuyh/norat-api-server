@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from datetime import date
 
-from application.domain.user.model import User
+from application.domain.user.model import FaceVerificationRequest, User
 from application.domain.user.model.vo import PreSignedUrl
 
 
@@ -47,4 +47,8 @@ class UserInputPort(ABC):
 
     @abstractmethod
     async def request_verifying_face(self, *, user_id: int, face_vide_s3_key: str):
+        ...
+
+    @abstractmethod
+    async def get_user_last_face_verification(self, *, user_id: int) -> FaceVerificationRequest:
         ...

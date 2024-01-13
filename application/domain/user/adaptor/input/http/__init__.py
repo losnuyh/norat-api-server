@@ -16,6 +16,7 @@ from .dto import (
     AgreeTermsRequest,
     CertificationRequest,
     CheckUserAccountDuplicationResponse,
+    GetLastFaceVerificationRequestResponse,
     PreSignedUrlResponse,
     RequestFaceVerificationRequest,
     UserResponse,
@@ -274,7 +275,7 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
     def request_face_verification(self):
         @user_router.post(
             path="/{user_id}/face-verification",
-            tags=["user"],
+            tags=["user", "face verification"],
             summary="얼굴 인증 요청",
             description="</br>".join(
                 [
@@ -306,3 +307,40 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
             return {
                 "message": "success",
             }
+
+    def get_last_face_verification(self):
+        @user_router.get(
+            path="/{user_id}/face-verification/last",
+            tags=["user", "face verification"],
+            summary="최근 얼굴 인증 요청 상태 확인",
+            description="</br>".join(
+                [
+                    "최근에 요청한 얼굴 인증의 처리 상태를 확인합니다.",
+                ],
+            ),
+            status_code=status.HTTP_200_OK,
+            responses={
+                status.HTTP_200_OK: {
+                    "model": GetLastFaceVerificationRequestResponse,
+                    "description": "성공",
+                },
+                status.HTTP_400_BAD_REQUEST: {
+                    "description": "실패",
+                },
+            },
+        )
+        async def handler(
+            user_id: Annotated[int, Path()],
+            request_user_id: Annotated[str, Depends(get_authenticated_user)],
+        ):
+            if user_id != request_user_id:
+                raise PermissionDenied("Not permitted")
+
+            result = await self.input.get_user_last_face_verification(
+                user_id=user_id,
+            )
+            return GetLastFaceVerificationRequestResponse(
+                requested_at=result.requested_at,
+                changed_at=result.changed_at,
+                status=result.status,
+            )

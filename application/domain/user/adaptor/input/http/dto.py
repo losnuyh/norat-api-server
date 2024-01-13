@@ -64,3 +64,9 @@ class PreSignedUrlResponse(BaseModel):
 
 class RequestFaceVerificationRequest(BaseModel):
     key: str = Field(title="s3 키")
+
+
+class GetLastFaceVerificationRequestResponse(BaseModel):
+    requested_at: datetime
+    changed_at: datetime
+    status: str
