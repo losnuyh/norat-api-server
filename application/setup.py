@@ -13,6 +13,8 @@ from application.domain.authentication.error import AuthenticationFail, Password
 from application.domain.authentication.use_case import AuthenticationUseCase
 from application.domain.school_board.adaptor.input.http import SchoolBoardHttpInputAdaptor, school_board_router
 from application.domain.school_board.adaptor.output import SchoolSearchOutputAdaptor
+from application.domain.school_board.adaptor.output.store import SchoolStoreOutputAdaptor
+from application.domain.school_board.error import AlreadySchoolMember
 from application.domain.school_board.use_case import SchoolBoardUseCase
 from application.domain.user.adaptor.input.http import UserHttpInputAdaptor, user_router
 from application.domain.user.adaptor.output.certification import CertificationOutputAdaptor
@@ -39,6 +41,7 @@ def setup_exception_handlers(application: FastAPI):
     @application.exception_handler(InvalidData)
     @application.exception_handler(AlreadyFaceVerified)
     @application.exception_handler(FaceVerificationFail)
+    @application.exception_handler(AlreadySchoolMember)
     def handle_bad_request(request: Request, exc: AuthenticationFail):
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -104,6 +107,11 @@ def setup_application(
         search_output=SchoolSearchOutputAdaptor(
             key=app_config.NEIS_KEY,
         ),
+        store_output=SchoolStoreOutputAdaptor(
+            engine=db_engine,
+            readonly_engine=readonly_engine,
+        ),
+        user_output=user_use_case,
     )
     school_http_application = SchoolBoardHttpInputAdaptor(
         input_adaptor=school_use_case,

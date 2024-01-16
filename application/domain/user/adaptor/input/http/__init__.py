@@ -110,7 +110,7 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
         async def handler(
             user_id: Annotated[int, Path()],
             body: Annotated[CertificationRequest, Body()],
-            request_user_id: Annotated[str, Depends(get_authenticated_user)],
+            request_user_id: Annotated[int, Depends(get_authenticated_user)],
         ):
             if user_id != request_user_id:
                 raise PermissionDenied("Not permitted")
@@ -144,7 +144,7 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
         async def handler(
             user_id: Annotated[int, Path()],
             body: Annotated[CertificationRequest, Body()],
-            request_user_id: Annotated[str, Depends(get_authenticated_user)],
+            request_user_id: Annotated[int, Depends(get_authenticated_user)],
         ):
             if user_id != request_user_id:
                 raise PermissionDenied("Not permitted")
@@ -225,7 +225,7 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
         async def handler(
             user_id: Annotated[int, Path()],
             body: Annotated[AgreeTermsRequest, Body()],
-            request_user_id: Annotated[str, Depends(get_authenticated_user)],
+            request_user_id: Annotated[int, Depends(get_authenticated_user)],
         ):
             if user_id != request_user_id:
                 raise PermissionDenied("Not permitted")
@@ -259,7 +259,7 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
         )
         async def handler(
             user_id: Annotated[int, Path()],
-            request_user_id: Annotated[str, Depends(get_authenticated_user)],
+            request_user_id: Annotated[int, Depends(get_authenticated_user)],
         ):
             if user_id != request_user_id:
                 raise PermissionDenied("Not permitted")
@@ -294,7 +294,7 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
         )
         async def handler(
             user_id: Annotated[int, Path()],
-            request_user_id: Annotated[str, Depends(get_authenticated_user)],
+            request_user_id: Annotated[int, Depends(get_authenticated_user)],
             body: Annotated[RequestFaceVerificationRequest, Body()],
         ):
             if user_id != request_user_id:
@@ -331,7 +331,7 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
         )
         async def handler(
             user_id: Annotated[int, Path()],
-            request_user_id: Annotated[str, Depends(get_authenticated_user)],
+            request_user_id: Annotated[int, Depends(get_authenticated_user)],
         ):
             if user_id != request_user_id:
                 raise PermissionDenied("Not permitted")

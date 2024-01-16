@@ -6,9 +6,10 @@ from dotenv import load_dotenv
 from sqlalchemy import engine_from_config, pool
 
 from application.domain.authentication.adaptor.output.store.table import Base as AuthenticationBase
+from application.domain.school_board.adaptor.output.store.table import Base as SchoolBoardBase
 from application.domain.user.adaptor.output.store.table import Base as UserBase
 
-load_dotenv(".env-migration-dev", override=True)
+load_dotenv(".env-migration", override=True)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -26,6 +27,7 @@ if config.config_file_name is not None:
 target_metadata = [
     AuthenticationBase.metadata,
     UserBase.metadata,
+    SchoolBoardBase.metadata,
 ]
 
 

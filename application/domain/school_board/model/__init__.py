@@ -1,5 +1,6 @@
-from .school import SchoolVO
+from .school import School, SchoolMember
 
 __all__ = [
-    "SchoolVO",
+    "School",
+    "SchoolMember",
 ]

@@ -66,7 +66,7 @@ class UserStoreAdaptor(UserStoreOutputPort):
             service_policy_agreed_at=user.service_policy_agreed_at,
             marketing_policy_agreed_at=user.marketing_policy_agreed_at,
             push_agreed_at=user.push_agreed_at,
-        )
+        )  # TODO: created_at 덮어쓰지 않도록 변경
         stmt = insert(UserTable).values(**user_row).on_duplicate_key_update(**user_row)
         result = await self.session.execute(stmt)
         user.id, *_ = result.inserted_primary_key_rows[0]
