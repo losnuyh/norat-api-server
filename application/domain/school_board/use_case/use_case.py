@@ -36,6 +36,8 @@ class SchoolBoardUseCase(SchoolBoardInputPort):
             if school is None:
                 raise NotFound("school code is wrong, school not found")
             user = await self.user_output.get_user_by_user_id(user_id=user_id)
+            if user is None:
+                raise NotFound("user not found")
             member = school.register_member(user=user, grade=grade)
             await uow.save_school_member(member=member)
             await uow.commit()
