@@ -162,3 +162,15 @@ class UserUseCase(UserInputPort):
             if not last_request:
                 raise NotFound("request not found")
             return last_request
+
+    async def withdraw_user(self, *, user_id: int):
+        # TODO: soft delete로 변경하거나 삭제된 데이터 별도 보관
+        # TODO: school member count 감소시켜야함
+        async with self.user_store() as uow:
+            user = await uow.get_user_by_user_id(user_id=user_id)
+            if user is None:
+                raise NotFound(f"user not exist, {user_id=}")
+
+            await uow.delete_user(user=user)
+            await self.auth_app.delete_authenticators(user_id=user_id)
+            await uow.commit()

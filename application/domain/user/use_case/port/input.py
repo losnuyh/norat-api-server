@@ -52,3 +52,7 @@ class UserInputPort(ABC):
     @abstractmethod
     async def get_user_last_face_verification(self, *, user_id: int) -> FaceVerificationRequest:
         ...
+
+    @abstractmethod
+    async def withdraw_user(self, *, user_id: int):
+        ...

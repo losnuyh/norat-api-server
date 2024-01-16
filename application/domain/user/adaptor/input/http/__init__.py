@@ -344,3 +344,37 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
                 changed_at=result.changed_at,
                 status=result.status,
             )
+
+    def withdraw_user(self):
+        @user_router.delete(
+            path="/{user_id}",
+            tags=["user"],
+            summary="회원 탈퇴",
+            description="</br>".join(
+                [
+                    "회원정보를 제거합니다.",
+                    "유저 데이터는 복구할 수 없습니다.",
+                    "[개선 예정] 학교 맴버 카운터는 줄어들지 않습니다.",  # TODO: 개선 후에 제거
+                ],
+            ),
+            status_code=status.HTTP_200_OK,
+            responses={
+                status.HTTP_200_OK: {
+                    "description": "성공",
+                },
+                status.HTTP_400_BAD_REQUEST: {
+                    "description": "실패",
+                },
+            },
+        )
+        async def handler(
+            user_id: Annotated[int, Path()],
+            request_user_id: Annotated[int, Depends(get_authenticated_user)],
+        ):
+            if user_id != request_user_id:
+                raise PermissionDenied("Not permitted")
+
+            await self.input.withdraw_user(
+                user_id=user_id,
+            )
+            return {"message": "success"}

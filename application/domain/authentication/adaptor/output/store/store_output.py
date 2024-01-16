@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.dialects.mysql import insert
 
 from application.domain.authentication.model import AuthenticationPhone, PasswordAuthenticator
@@ -45,9 +45,11 @@ class AuthenticationStoreAdaptor(AuthenticationStoreOutputPort):
         await self.session.execute(stmt)
 
     async def get_user_password_authenticator_by_user_id(self, *, user_id: int) -> PasswordAuthenticator | None:
-        stmt = select(PasswordAuthenticatorTable).where(
-            PasswordAuthenticatorTable.user_id == user_id
-        ).order_by(PasswordAuthenticatorTable.id.desc())
+        stmt = (
+            select(PasswordAuthenticatorTable)
+            .where(PasswordAuthenticatorTable.user_id == user_id)
+            .order_by(PasswordAuthenticatorTable.id.desc())
+        )
         data: PasswordAuthenticatorTable = await self.session.scalar(stmt)
         if data is None:
             return None
@@ -61,9 +63,11 @@ class AuthenticationStoreAdaptor(AuthenticationStoreOutputPort):
         )
 
     async def get_user_password_authenticator_by_user_account(self, *, account: str) -> PasswordAuthenticator | None:
-        stmt = select(PasswordAuthenticatorTable).where(
-            PasswordAuthenticatorTable.user_account == account
-        ).order_by(PasswordAuthenticatorTable.id.desc())
+        stmt = (
+            select(PasswordAuthenticatorTable)
+            .where(PasswordAuthenticatorTable.user_account == account)
+            .order_by(PasswordAuthenticatorTable.id.desc())
+        )
         data: PasswordAuthenticatorTable = await self.session.scalar(stmt)
         if data is None:
             return None
@@ -75,3 +79,9 @@ class AuthenticationStoreAdaptor(AuthenticationStoreOutputPort):
             refresh_token=data.refresh_token,
             refresh_token_expired_at=data.refresh_token_expired_at.replace(tzinfo=timezone.utc),
         )
+
+    async def delete_password_authenticator(self, *, password_authenticator: PasswordAuthenticator):
+        stmt = delete(PasswordAuthenticatorTable).where(
+            PasswordAuthenticatorTable.user_id == password_authenticator.user_id,
+        )
+        await self.session.execute(stmt)

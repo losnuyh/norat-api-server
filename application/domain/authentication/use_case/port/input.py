@@ -27,3 +27,7 @@ class AuthenticationInputPort(ABC):
     @abstractmethod
     async def change_password(self, *, user_id: int, password: str, new_password: str):
         ...
+
+    @abstractmethod
+    async def delete_authenticators(self, *, user_id: int):
+        ...

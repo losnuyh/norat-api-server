@@ -59,6 +59,7 @@ class AuthenticationUseCase(AuthenticationInputPort):
     async def login_user_with_password(self, *, account: str, password: str) -> AuthToken:
         async with self.auth_store(read_only=True) as uow:
             password_authenticator = await uow.get_user_password_authenticator_by_user_account(account=account)
+
             return password_authenticator.get_token_by_password(password=password)
 
     async def refresh_user_token(self, *, user_id: int, refresh_token: str) -> AuthToken:
@@ -80,4 +81,13 @@ class AuthenticationUseCase(AuthenticationInputPort):
 
             password_authenticator.change_password(password=password, new_password=new_password)
             await uow.save_user_password_authenticator(password_authenticator=password_authenticator)
+            await uow.commit()
+
+    async def delete_authenticators(self, *, user_id: int):
+        async with self.auth_store() as uow:
+            password_authenticator = await uow.get_user_password_authenticator_by_user_id(user_id=user_id)
+            if password_authenticator is None:
+                raise AuthenticationFail("authentication not found")
+
+            await uow.delete_password_authenticator(password_authenticator=password_authenticator)
             await uow.commit()

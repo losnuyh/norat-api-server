@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from sqlalchemy import Select, select
+from sqlalchemy import Select, delete, select
 from sqlalchemy.dialects.mysql import insert
 
 from application.domain.user.model import CertificationInfo, CertificationType, FaceVerificationRequest, User
@@ -130,3 +130,7 @@ class UserStoreAdaptor(UserStoreOutputPort):
             requested_at=data.requested_at,
             changed_at=data.changed_at,
         )
+
+    async def delete_user(self, *, user: User):
+        stmt = delete(UserTable).where(UserTable.id == user.id)
+        await self.session.execute(stmt)
