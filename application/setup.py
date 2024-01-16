@@ -11,7 +11,11 @@ from application.domain.authentication.adaptor.output.sms_sender import SMSCodeS
 from application.domain.authentication.adaptor.output.store import AuthenticationStoreAdaptor
 from application.domain.authentication.error import AuthenticationFail, PasswordNotMatched, PasswordValidationFail
 from application.domain.authentication.use_case import AuthenticationUseCase
-from application.domain.school_board.adaptor.input.http import SchoolBoardHttpInputAdaptor, school_board_router
+from application.domain.school_board.adaptor.input.http import (
+    SchoolBoardHttpInputAdaptor,
+    school_board_router,
+    user_router_in_school_board,
+)
 from application.domain.school_board.adaptor.output import SchoolSearchOutputAdaptor
 from application.domain.school_board.adaptor.output.store import SchoolStoreOutputAdaptor
 from application.domain.school_board.error import AlreadySchoolMember
@@ -123,6 +127,7 @@ def setup_application(
 
     app.include_router(authentication_router, prefix="/authentication")
     app.include_router(user_router, prefix="/user")
+    app.include_router(user_router_in_school_board, prefix="/user")
     app.include_router(school_board_router, prefix="/school")
 
     setup_exception_handlers(app)

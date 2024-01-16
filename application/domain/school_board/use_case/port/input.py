@@ -1,6 +1,13 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 
 from application.domain.school_board.model import School
+
+
+@dataclass(kw_only=True)
+class UserSchoolInfo:
+    school: School
+    grade: int
 
 
 class SchoolBoardInputPort(ABC):
@@ -13,5 +20,5 @@ class SchoolBoardInputPort(ABC):
         ...
 
     @abstractmethod
-    async def get_user_school(self, *, user_id: int) -> School:
+    async def get_user_school(self, *, user_id: int) -> UserSchoolInfo:
         ...

@@ -1,6 +1,6 @@
 from application.domain.school_board.error import AlreadySchoolMember
 from application.domain.school_board.model import School
-from application.domain.school_board.use_case.port.input import SchoolBoardInputPort
+from application.domain.school_board.use_case.port.input import SchoolBoardInputPort, UserSchoolInfo
 from application.domain.school_board.use_case.port.output import (
     SchoolSearchOutputPort,
     SchoolStoreOutputPort,
@@ -42,5 +42,16 @@ class SchoolBoardUseCase(SchoolBoardInputPort):
             await uow.save_school_member(member=member)
             await uow.commit()
 
-    async def get_user_school(self, *, user_id: int) -> School:
-        return School(school_code="abc", name="name", address="address")
+    async def get_user_school(self, *, user_id: int) -> UserSchoolInfo:
+        async with self.school_store_output as uow:
+            school_member = await uow.get_user_school_member(user_id=user_id)
+            if school_member is None:
+                raise NotFound("user school not found")
+            school = await self.school_search_output.get_school_by_code(school_code=school_member.school_code)
+            if school is None:
+                raise NotFound("school code is wrong, school not found")
+
+        return UserSchoolInfo(
+            school=school,
+            grade=school_member.grade,
+        )

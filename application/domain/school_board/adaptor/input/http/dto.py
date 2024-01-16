@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 
 from application.domain.school_board.model import School
+from application.domain.school_board.use_case.port.input import UserSchoolInfo
 
 
 class SchoolSearchResultResponse(BaseModel):
@@ -12,3 +13,7 @@ class SchoolSearchResultResponse(BaseModel):
 
 class RegisterSchoolMemberRequest(BaseModel):
     grade: int = Field(title="학년")
+
+
+class UserSchoolInfoResponse(BaseModel):
+    info: UserSchoolInfo = Field(title="유저가 등록한 학교 정보")

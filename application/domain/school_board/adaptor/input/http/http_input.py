@@ -3,12 +3,14 @@ from typing import Annotated
 from fastapi import APIRouter, Body, Depends, Path, Query, status
 
 from application.domain.school_board.use_case.port.input import SchoolBoardInputPort
+from application.error import PermissionDenied
 from application.infra.fastapi import WithFastAPIRouter
 from application.infra.fastapi.auth import get_authenticated_user
 
-from .dto import RegisterSchoolMemberRequest, SchoolSearchResultResponse
+from .dto import RegisterSchoolMemberRequest, SchoolSearchResultResponse, UserSchoolInfoResponse
 
 school_board_router = APIRouter()
+user_router_in_school_board = APIRouter()
 
 
 class SchoolBoardHttpInputAdaptor(WithFastAPIRouter):
@@ -75,3 +77,39 @@ class SchoolBoardHttpInputAdaptor(WithFastAPIRouter):
                 grade=body.grade,
             )
             return {"message": "success"}
+
+    def get_user_school_info(self):
+        @user_router_in_school_board.get(
+            path="/{user_id}/school",
+            tags=["school", "user"],
+            summary="유저 학교 정보 획득",
+            description="</br>".join(
+                [
+                    "유저의 학교 정보를 획득합니다.",
+                    "학교를 이미 등록한 경우에만 확인할 수 있습니다.",
+                ],
+            ),
+            status_code=status.HTTP_200_OK,
+            response_description="학교 맴버로 등록",
+            responses={
+                status.HTTP_200_OK: {
+                    "model": UserSchoolInfoResponse,
+                    "description": "발송 성공",
+                },
+                status.HTTP_404_NOT_FOUND: {
+                    "description": "찾을 수 없는 정보",
+                },
+            },
+        )
+        async def handler(
+            user_id: Annotated[int, Path()],
+            request_user_id: Annotated[int, Depends(get_authenticated_user)],
+        ):
+            if user_id != request_user_id:
+                raise PermissionDenied("Not permitted")
+            info = await self.input.get_user_school(
+                user_id=request_user_id,
+            )
+            return UserSchoolInfoResponse(
+                info=info,
+            )
