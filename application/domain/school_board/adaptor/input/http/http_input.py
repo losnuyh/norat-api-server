@@ -7,7 +7,12 @@ from application.error import PermissionDenied
 from application.infra.fastapi import WithFastAPIRouter
 from application.infra.fastapi.auth import get_authenticated_user
 
-from .dto import RegisterSchoolMemberRequest, SchoolSearchResultResponse, UserSchoolInfoResponse
+from .dto import (
+    RegisterSchoolMemberRequest,
+    SchoolBoardInfoResponse,
+    SchoolSearchResultResponse,
+    UserSchoolInfoResponse,
+)
 
 school_board_router = APIRouter()
 user_router_in_school_board = APIRouter()
@@ -77,6 +82,41 @@ class SchoolBoardHttpInputAdaptor(WithFastAPIRouter):
                 grade=body.grade,
             )
             return {"message": "success"}
+
+    def get_school_board_info(self):
+        @school_board_router.get(
+            path="/{school_code}/grade/{grade}",
+            tags=["school"],
+            summary="학교 상태 확인",
+            description="</br>".join(
+                [
+                    "학교 + 학년 등록 상태를 확인 확인합니다.",
+                ],
+            ),
+            status_code=status.HTTP_200_OK,
+            response_description="학교+학년 정보 확인",
+            responses={
+                status.HTTP_200_OK: {
+                    "model": SchoolBoardInfoResponse,
+                    "description": "학교 학년 게시판 상태 정보",
+                },
+                status.HTTP_400_BAD_REQUEST: {
+                    "description": "잘못된 요청",
+                },
+            },
+        )
+        async def handler(
+            school_code: Annotated[str, Path()],
+            grade: Annotated[int, Path()],
+            _: Annotated[int, Depends(get_authenticated_user)],
+        ):
+            info = await self.input.get_school_board_info(
+                school_code=school_code,
+                grade=grade,
+            )
+            return SchoolBoardInfoResponse(
+                info=info,
+            )
 
     def get_user_school_info(self):
         @user_router_in_school_board.get(

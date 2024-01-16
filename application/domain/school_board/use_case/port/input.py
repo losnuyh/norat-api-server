@@ -10,6 +10,13 @@ class UserSchoolInfo:
     grade: int
 
 
+@dataclass
+class SchoolBoardInfo:
+    school: School
+    grade: int
+    total_member_count: int
+
+
 class SchoolBoardInputPort(ABC):
     @abstractmethod
     async def search_school(self, *, keyword: str) -> list[School]:
@@ -21,4 +28,8 @@ class SchoolBoardInputPort(ABC):
 
     @abstractmethod
     async def get_user_school(self, *, user_id: int) -> UserSchoolInfo:
+        ...
+
+    @abstractmethod
+    async def get_school_board_info(self, *, school_code: str, grade: int) -> SchoolBoardInfo:
         ...

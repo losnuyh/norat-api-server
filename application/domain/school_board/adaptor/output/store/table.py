@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import String
+from sqlalchemy import String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .base import Base
@@ -29,3 +29,22 @@ class SchoolMemberTable(Base):
         nullable=False,
         kw_only=True,
     )
+
+
+class SchoolMemberCountTable(Base):
+    __tablename__ = "school_member_count"
+
+    id: Mapped[int] = mapped_column(primary_key=True, kw_only=True)
+    school_code: Mapped[str] = mapped_column(
+        String(8),
+        nullable=False,
+        kw_only=True,
+    )
+    grade: Mapped[int] = mapped_column(
+        nullable=False,
+        kw_only=True,
+    )
+    member_count: Mapped[int] = mapped_column(
+        default=0,
+    )
+    __table_args__ = (UniqueConstraint("school_code", "grade", name="school_grade_uc"),)

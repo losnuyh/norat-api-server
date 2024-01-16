@@ -1,6 +1,6 @@
 from application.domain.school_board.error import AlreadySchoolMember
 from application.domain.school_board.model import School
-from application.domain.school_board.use_case.port.input import SchoolBoardInputPort, UserSchoolInfo
+from application.domain.school_board.use_case.port.input import SchoolBoardInfo, SchoolBoardInputPort, UserSchoolInfo
 from application.domain.school_board.use_case.port.output import (
     SchoolSearchOutputPort,
     SchoolStoreOutputPort,
@@ -55,3 +55,15 @@ class SchoolBoardUseCase(SchoolBoardInputPort):
             school=school,
             grade=school_member.grade,
         )
+
+    async def get_school_board_info(self, *, school_code: str, grade: int) -> SchoolBoardInfo:
+        async with self.school_store_output as uow:
+            school = await self.school_search_output.get_school_by_code(school_code=school_code)
+            if school is None:
+                raise NotFound("school code is wrong, school not found")
+            member_count = await uow.get_school_member_count(school_code=school_code, grade=grade)
+            return SchoolBoardInfo(
+                school=school,
+                grade=grade,
+                total_member_count=member_count,
+            )

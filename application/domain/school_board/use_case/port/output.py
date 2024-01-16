@@ -25,6 +25,10 @@ class SchoolStoreOutputPort(UnitOfWork, ABC):
     async def get_user_school_member(self, *, user_id: int) -> SchoolMember | None:
         ...
 
+    @abstractmethod
+    async def get_school_member_count(self, *, school_code: str, grade: int) -> int:
+        ...
+
 
 class UserOutputPort(Protocol):
     async def get_user_by_user_id(self, *, user_id: int) -> User:
