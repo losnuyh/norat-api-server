@@ -61,13 +61,15 @@ class UserStoreAdaptor(UserStoreOutputPort):
             phone=user.phone,
             birth=user.birth,
             verified_at=user.verified_at,
-            created_at=now,
             privacy_policy_agreed_at=user.privacy_policy_agreed_at,
             service_policy_agreed_at=user.service_policy_agreed_at,
             marketing_policy_agreed_at=user.marketing_policy_agreed_at,
             push_agreed_at=user.push_agreed_at,
-        )  # TODO: created_at 덮어쓰지 않도록 변경
-        stmt = insert(UserTable).values(**user_row).on_duplicate_key_update(**user_row)
+        )
+        stmt = insert(UserTable).values(
+            created_at=now,
+            **user_row
+        ).on_duplicate_key_update(**user_row)
         result = await self.session.execute(stmt)
         user.id, *_ = result.inserted_primary_key_rows[0]
         return user
