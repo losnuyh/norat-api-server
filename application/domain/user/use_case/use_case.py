@@ -166,6 +166,7 @@ class UserUseCase(UserInputPort):
     async def withdraw_user(self, *, user_id: int):
         # TODO: soft delete로 변경하거나 삭제된 데이터 별도 보관
         # TODO: school member count 감소시켜야함
+        # TODO: school member 데이터 지워야함, 탈퇴 후 만료전까지 계속 글 쓸 수 있음
         async with self.user_store() as uow:
             user = await uow.get_user_by_user_id(user_id=user_id)
             if user is None:
