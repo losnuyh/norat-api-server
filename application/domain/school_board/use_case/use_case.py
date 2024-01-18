@@ -78,7 +78,7 @@ class SchoolBoardUseCase(SchoolBoardInputPort):
                 school_code=school_member.school_code,
                 grade=school_member.grade,
             )
-            if member_count < 15:
+            if member_count < 20:
                 raise SchoolBoardNotOpen("not open")
 
             school_member.set_queue_loader(loader=uow)
