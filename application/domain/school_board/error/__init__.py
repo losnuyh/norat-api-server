@@ -1,2 +1,6 @@
 class AlreadySchoolMember(Exception):
     ...
+
+
+class SchoolBoardNotOpen(Exception):
+    ...

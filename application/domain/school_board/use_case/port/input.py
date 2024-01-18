@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from application.domain.school_board.model import School
+from application.domain.school_board.model import QueueItem, School
 
 
 @dataclass(kw_only=True)
@@ -15,6 +15,12 @@ class SchoolBoardInfo:
     school: School
     grade: int
     total_member_count: int
+
+
+@dataclass
+class PostWriteInput:
+    title: str
+    content: str
 
 
 class SchoolBoardInputPort(ABC):
@@ -32,4 +38,8 @@ class SchoolBoardInputPort(ABC):
 
     @abstractmethod
     async def get_school_board_info(self, *, school_code: str, grade: int) -> SchoolBoardInfo:
+        ...
+
+    @abstractmethod
+    async def write_post(self, *, writer_id: int, title: str, content: str) -> QueueItem:
         ...

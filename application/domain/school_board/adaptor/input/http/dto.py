@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel, Field
 
 from application.domain.school_board.model import School
@@ -21,3 +23,17 @@ class UserSchoolInfoResponse(BaseModel):
 
 class SchoolBoardInfoResponse(BaseModel):
     info: SchoolBoardInfo = Field(title="학교 학년 게시판 상태")
+
+
+class WritePostRequest(BaseModel):
+    title: str
+    content: str
+
+
+class QueueItemResponse(BaseModel):
+    id: int
+    title: str
+    content: str
+    random_nickname: str
+    created_at: datetime
+    rejected_at: datetime | None

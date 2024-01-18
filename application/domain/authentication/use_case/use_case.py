@@ -10,6 +10,7 @@ from application.domain.authentication.model import (
 )
 from application.domain.authentication.use_case.port.input import AuthenticationInputPort, UserData
 from application.domain.authentication.use_case.port.output import AuthenticationStoreOutputPort, CodeSenderOutputPort
+from application.error import NotFound
 
 
 class AuthenticationUseCase(AuthenticationInputPort):
@@ -59,7 +60,8 @@ class AuthenticationUseCase(AuthenticationInputPort):
     async def login_user_with_password(self, *, account: str, password: str) -> AuthToken:
         async with self.auth_store(read_only=True) as uow:
             password_authenticator = await uow.get_user_password_authenticator_by_user_account(account=account)
-
+            if password_authenticator is None:
+                raise NotFound("user not found")
             return password_authenticator.get_token_by_password(password=password)
 
     async def refresh_user_token(self, *, user_id: int, refresh_token: str) -> AuthToken:

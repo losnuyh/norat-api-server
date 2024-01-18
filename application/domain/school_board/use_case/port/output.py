@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Protocol
 
-from application.domain.school_board.model import School, SchoolMember
+from application.domain.school_board.model import Post, QueueItem, School, SchoolMember
 from application.domain.user.model import User
 from application.infra.unit_of_work.sqlalchemy import UnitOfWork
 
@@ -27,6 +27,18 @@ class SchoolStoreOutputPort(UnitOfWork, ABC):
 
     @abstractmethod
     async def get_school_member_count(self, *, school_code: str, grade: int) -> int:
+        ...
+
+    @abstractmethod
+    async def save_post(self, *, post: Post):
+        ...
+
+    @abstractmethod
+    async def get_user_queue_item(self, *, user_id: int, school_code: str, grade: int) -> list[QueueItem]:
+        ...
+
+    @abstractmethod
+    async def save_queue_item(self, *, item: QueueItem):
         ...
 
 

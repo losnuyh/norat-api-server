@@ -8,10 +8,12 @@ from application.infra.fastapi import WithFastAPIRouter
 from application.infra.fastapi.auth import get_authenticated_user
 
 from .dto import (
+    QueueItemResponse,
     RegisterSchoolMemberRequest,
     SchoolBoardInfoResponse,
     SchoolSearchResultResponse,
     UserSchoolInfoResponse,
+    WritePostRequest,
 )
 
 school_board_router = APIRouter()
@@ -152,4 +154,42 @@ class SchoolBoardHttpInputAdaptor(WithFastAPIRouter):
             )
             return UserSchoolInfoResponse(
                 info=info,
+            )
+
+    def write_post(self):
+        @school_board_router.post(
+            path="/{school_code}/grade/{grade}/post/queue",
+            tags=["school", "post"],
+            summary="학교 게시판에 글 작성하기",
+            description="</br>".join(
+                [
+                    "등록한 학교 학년 게시판에 글을 작성합니다.",
+                    "작성한 글은 대기 큐에서 심사를 기다립니다.",
+                ],
+            ),
+            status_code=status.HTTP_200_OK,
+            response_description="대기 큐에 글 작성 결과",
+            responses={
+                status.HTTP_200_OK: {
+                    "model": QueueItemResponse,
+                    "description": "발송 성공",
+                },
+                status.HTTP_404_NOT_FOUND: {
+                    "description": "찾을 수 없는 정보",
+                },
+            },
+        )
+        async def handler(
+            request_user_id: Annotated[int, Depends(get_authenticated_user)],
+            body: Annotated[WritePostRequest, Body()],
+        ):
+            item = await self.input.write_post(writer_id=request_user_id, title=body.title, content=body.content)
+            assert item.id is not None
+            return QueueItemResponse(
+                id=item.id,
+                title=item.post.title,
+                content=item.post.content,
+                random_nickname=item.post.writer_random_nickname,
+                created_at=item.post.created_at,
+                rejected_at=item.rejected_at,
             )

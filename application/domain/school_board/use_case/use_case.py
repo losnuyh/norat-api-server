@@ -1,12 +1,12 @@
-from application.domain.school_board.error import AlreadySchoolMember
-from application.domain.school_board.model import School
+from application.domain.school_board.error import AlreadySchoolMember, SchoolBoardNotOpen
+from application.domain.school_board.model import QueueItem, School
 from application.domain.school_board.use_case.port.input import SchoolBoardInfo, SchoolBoardInputPort, UserSchoolInfo
 from application.domain.school_board.use_case.port.output import (
     SchoolSearchOutputPort,
     SchoolStoreOutputPort,
     UserOutputPort,
 )
-from application.error import NotFound
+from application.error import NotFound, PermissionDenied
 
 
 class SchoolBoardUseCase(SchoolBoardInputPort):
@@ -67,3 +67,28 @@ class SchoolBoardUseCase(SchoolBoardInputPort):
                 grade=grade,
                 total_member_count=member_count,
             )
+
+    async def write_post(self, *, writer_id: int, title: str, content: str) -> QueueItem:
+        async with self.school_store_output as uow:
+            school_member = await uow.get_user_school_member(user_id=writer_id)
+            if school_member is None:
+                raise PermissionDenied("invalid request")
+
+            member_count = await uow.get_school_member_count(
+                school_code=school_member.school_code,
+                grade=school_member.grade,
+            )
+            if member_count < 15:
+                raise SchoolBoardNotOpen("not open")
+
+            school_member.set_queue_loader(loader=uow)
+            await school_member.load_queue_items()
+            if len(school_member.post_queue) >= 5:
+                raise Exception
+            queueing_item = school_member.write_post_and_queueing(
+                title=title,
+                content=content,
+            )
+            await uow.save_queue_item(item=queueing_item)
+            await uow.commit()
+        return queueing_item

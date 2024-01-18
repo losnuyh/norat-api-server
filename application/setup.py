@@ -18,7 +18,7 @@ from application.domain.school_board.adaptor.input.http import (
 )
 from application.domain.school_board.adaptor.output import SchoolSearchOutputAdaptor
 from application.domain.school_board.adaptor.output.store import SchoolStoreOutputAdaptor
-from application.domain.school_board.error import AlreadySchoolMember
+from application.domain.school_board.error import AlreadySchoolMember, SchoolBoardNotOpen
 from application.domain.school_board.use_case import SchoolBoardUseCase
 from application.domain.user.adaptor.input.http import UserHttpInputAdaptor, user_router
 from application.domain.user.adaptor.output.certification import CertificationOutputAdaptor
@@ -31,7 +31,7 @@ from application.domain.user.error import (
     FaceVerificationFail,
 )
 from application.domain.user.use_case import UserUseCase
-from application.error import InvalidData, NotFound, PermissionDenied
+from application.error import InvalidData, NotFound, PermissionDenied, ServerError
 from application.infra.sms import SMSSender
 
 
@@ -46,6 +46,7 @@ def setup_exception_handlers(application: FastAPI):
     @application.exception_handler(AlreadyFaceVerified)
     @application.exception_handler(FaceVerificationFail)
     @application.exception_handler(AlreadySchoolMember)
+    @application.exception_handler(SchoolBoardNotOpen)
     def handle_bad_request(request: Request, exc: AuthenticationFail):
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -68,6 +69,13 @@ def setup_exception_handlers(application: FastAPI):
                 "detail": "Not authenticated",
             },
             headers={"WWW-Authenticated": "Bearer"},
+        )
+
+    @application.exception_handler(ServerError)
+    def handler_server_error(request: Request, exc):
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={"error": str(exc)},
         )
 
 

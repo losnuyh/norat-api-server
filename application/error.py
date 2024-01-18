@@ -8,3 +8,7 @@ class NotFound(Exception):
 
 class InvalidData(Exception):
     ...
+
+
+class ServerError(Exception):
+    ...
