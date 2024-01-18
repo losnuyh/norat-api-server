@@ -53,6 +53,9 @@ class SchoolMember:
     post_queue: list[QueueItem] = field(default_factory=list)
     _queue_loader: QueueItemLoader | None = None
 
+    def is_member(self, *, school_code: str, grade: int) -> bool:
+        return self.school_code == school_code and self.grade == grade
+
     def write_post_and_queueing(self, title: str, content: str) -> QueueItem:
         now = datetime.now(tz=timezone.utc)
         item = QueueItem(

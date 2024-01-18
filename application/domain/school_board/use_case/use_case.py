@@ -68,23 +68,23 @@ class SchoolBoardUseCase(SchoolBoardInputPort):
                 total_member_count=member_count,
             )
 
-    async def write_post(self, *, writer_id: int, title: str, content: str) -> QueueItem:
+    async def write_post(self, *, school_code: str, grade: int, writer_id: int, title: str, content: str) -> QueueItem:
         async with self.school_store_output as uow:
             school_member = await uow.get_user_school_member(user_id=writer_id)
-            if school_member is None:
+            if school_member is None or not school_member.is_member(school_code=school_code, grade=grade):
                 raise PermissionDenied("invalid request")
 
             member_count = await uow.get_school_member_count(
                 school_code=school_member.school_code,
                 grade=school_member.grade,
             )
-            if member_count < 20:
+            if member_count < 20:  # TODO: 한번 열리면 닫히지 않게
                 raise SchoolBoardNotOpen("not open")
 
             school_member.set_queue_loader(loader=uow)
             await school_member.load_queue_items()
             if len(school_member.post_queue) >= 5:
-                raise Exception
+                raise Exception  # TODO: ERROR CLASS
             queueing_item = school_member.write_post_and_queueing(
                 title=title,
                 content=content,
@@ -92,3 +92,14 @@ class SchoolBoardUseCase(SchoolBoardInputPort):
             await uow.save_queue_item(item=queueing_item)
             await uow.commit()
         return queueing_item
+
+    async def get_user_queue(self, *, school_code: str, grade: int, user_id: int) -> list[QueueItem]:
+        async with self.school_store_output(read_only=True) as uow:
+            school_member = await uow.get_user_school_member(user_id=user_id)
+            if school_member is None or not school_member.is_member(school_code=school_code, grade=grade):
+                raise PermissionDenied("invalid request")
+
+            school_member.set_queue_loader(loader=uow)
+            await school_member.load_queue_items()
+
+        return school_member.post_queue

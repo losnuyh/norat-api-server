@@ -41,5 +41,9 @@ class SchoolBoardInputPort(ABC):
         ...
 
     @abstractmethod
-    async def write_post(self, *, writer_id: int, title: str, content: str) -> QueueItem:
+    async def write_post(self, *, school_code: str, grade: int, writer_id: int, title: str, content: str) -> QueueItem:
+        ...
+
+    @abstractmethod
+    async def get_user_queue(self, *, school_code: str, grade: int, user_id: int) -> list[QueueItem]:
         ...

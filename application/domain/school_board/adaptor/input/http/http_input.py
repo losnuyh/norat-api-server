@@ -159,11 +159,13 @@ class SchoolBoardHttpInputAdaptor(WithFastAPIRouter):
     def write_post(self):
         @school_board_router.post(
             path="/{school_code}/grade/{grade}/post/queue",
-            tags=["school", "post"],
+            tags=["queue"],
             summary="학교 게시판에 글 작성하기",
             description="</br>".join(
                 [
                     "등록한 학교 학년 게시판에 글을 작성합니다.",
+                    "내 큐에 글이 5개이상이면 더이상 작성할 수 없습니다",
+                    "- 타이밍 이슈로 5개가 넘을 수 있습니다.",
                     "작성한 글은 대기 큐에서 심사를 기다립니다.",
                 ],
             ),
@@ -181,9 +183,17 @@ class SchoolBoardHttpInputAdaptor(WithFastAPIRouter):
         )
         async def handler(
             request_user_id: Annotated[int, Depends(get_authenticated_user)],
+            school_code: Annotated[str, Path()],
+            grade: Annotated[int, Path()],
             body: Annotated[WritePostRequest, Body()],
         ):
-            item = await self.input.write_post(writer_id=request_user_id, title=body.title, content=body.content)
+            item = await self.input.write_post(
+                school_code=school_code,
+                grade=grade,
+                writer_id=request_user_id,
+                title=body.title,
+                content=body.content,
+            )
             assert item.id is not None
             return QueueItemResponse(
                 id=item.id,
@@ -193,3 +203,48 @@ class SchoolBoardHttpInputAdaptor(WithFastAPIRouter):
                 created_at=item.post.created_at,
                 rejected_at=item.rejected_at,
             )
+
+    def get_my_post_in_queue(self):
+        @school_board_router.get(
+            path="/{school_code}/grade/{grade}/post/queue",
+            tags=["queue"],
+            summary="심사 대기중인 내 포스트 보기",
+            description="</br>".join(
+                [
+                    "심사 대기중인 글을 확인할 수 있습니다.",
+                ],
+            ),
+            status_code=status.HTTP_200_OK,
+            response_description="대기 큐 글 목록",
+            responses={
+                status.HTTP_200_OK: {
+                    "model": list[QueueItemResponse],
+                    "description": "발송 성공",
+                },
+                status.HTTP_404_NOT_FOUND: {
+                    "description": "찾을 수 없는 정보",
+                },
+            },
+        )
+        async def handler(
+            request_user_id: Annotated[int, Depends(get_authenticated_user)],
+            school_code: Annotated[str, Path()],
+            grade: Annotated[int, Path()],
+        ):
+            result = await self.input.get_user_queue(
+                school_code=school_code,
+                grade=grade,
+                user_id=request_user_id,
+            )
+            return [
+                QueueItemResponse(
+                    id=item.id,
+                    title=item.post.title,
+                    content=item.post.content,
+                    random_nickname=item.post.writer_random_nickname,
+                    created_at=item.post.created_at,
+                    rejected_at=item.rejected_at,
+                )
+                for item in result
+                if item.id is not None
+            ]
