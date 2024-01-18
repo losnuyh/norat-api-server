@@ -160,11 +160,11 @@ class SchoolBoardHttpInputAdaptor(WithFastAPIRouter):
         @school_board_router.post(
             path="/{school_code}/grade/{grade}/post/queue",
             tags=["queue"],
-            summary="학교 게시판에 글 작성하기",
+            summary="학교 게시판에 대기 큐에 글 작성하기",
             description="</br>".join(
                 [
-                    "등록한 학교 학년 게시판에 글을 작성합니다.",
-                    "내 큐에 글이 5개이상이면 더이상 작성할 수 없습니다",
+                    "등록한 학교 학년 게시판 대기 큐에 글을 작성합니다.",
+                    "내 큐에 글이 5개 이상이면 더이상 작성할 수 없습니다",
                     "- 타이밍 이슈로 5개가 넘을 수 있습니다.",
                     "작성한 글은 대기 큐에서 심사를 기다립니다.",
                 ],
@@ -208,10 +208,10 @@ class SchoolBoardHttpInputAdaptor(WithFastAPIRouter):
         @school_board_router.get(
             path="/{school_code}/grade/{grade}/post/queue",
             tags=["queue"],
-            summary="심사 대기중인 내 포스트 보기",
+            summary="내 대기 큐에 있는 포스트 보기",
             description="</br>".join(
                 [
-                    "심사 대기중인 글을 확인할 수 있습니다.",
+                    "대기중인 글을 확인할 수 있습니다.",
                 ],
             ),
             status_code=status.HTTP_200_OK,
@@ -248,3 +248,37 @@ class SchoolBoardHttpInputAdaptor(WithFastAPIRouter):
                 for item in result
                 if item.id is not None
             ]
+
+    def delete_my_post_in_queue(self):
+        @school_board_router.delete(
+            path="/{school_code}/grade/{grade}/post/queue/{post_item_id}",
+            tags=["queue"],
+            summary="큐에 작성한 글 지우기",
+            description="</br>".join(
+                [
+                    "큐에 등록된 글을 제거합니다.",
+                ],
+            ),
+            status_code=status.HTTP_200_OK,
+            responses={
+                status.HTTP_200_OK: {
+                    "description": "제거 성공",
+                },
+                status.HTTP_404_NOT_FOUND: {
+                    "description": "찾을 수 없는 정보",
+                },
+            },
+        )
+        async def handler(
+            request_user_id: Annotated[int, Depends(get_authenticated_user)],
+            school_code: Annotated[str, Path()],
+            grade: Annotated[int, Path()],
+            post_item_id: Annotated[int, Path()],
+        ):
+            await self.input.delete_user_post_in_queue(
+                school_code=school_code,
+                grade=grade,
+                user_id=request_user_id,
+                post_item_id=post_item_id,
+            )
+            return {"message": "success"}

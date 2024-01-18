@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from typing import Sequence
 
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.dialects.mysql import insert
 
 from application.domain.school_board.model import Post, QueueItem, SchoolMember
@@ -128,3 +128,7 @@ class SchoolStoreOutputAdaptor(SchoolStoreOutputPort):
         stmt = insert(QueueItemTable).values(**item_row).on_duplicate_key_update(**item_row)
         result = await self.session.execute(stmt)
         item.id, *_ = result.inserted_primary_key_rows[0]
+
+    async def delete_queue_item(self, *, item: QueueItem):
+        stmt = delete(QueueItemTable).where(QueueItemTable.id == item.id)
+        await self.session.execute(stmt)

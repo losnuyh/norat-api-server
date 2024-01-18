@@ -84,3 +84,9 @@ class SchoolMember:
             grade=self.grade,
         )
         self.post_queue = items
+
+    def remove_queue_item_by_id(self, *, post_item_id: int) -> QueueItem | None:
+        for idx, item in enumerate(self.post_queue):
+            if item.id == post_item_id:
+                return self.post_queue.pop(idx)
+        return None

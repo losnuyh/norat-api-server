@@ -103,3 +103,19 @@ class SchoolBoardUseCase(SchoolBoardInputPort):
             await school_member.load_queue_items()
 
         return school_member.post_queue
+
+    async def delete_user_post_in_queue(self, *, school_code: str, grade: int, user_id: int, post_item_id: int):
+        async with self.school_store_output as uow:
+            school_member = await uow.get_user_school_member(user_id=user_id)
+            if school_member is None or not school_member.is_member(school_code=school_code, grade=grade):
+                raise PermissionDenied("invalid request")
+
+            school_member.set_queue_loader(loader=uow)
+            await school_member.load_queue_items()
+            post_item = school_member.remove_queue_item_by_id(post_item_id=post_item_id)
+            if post_item is None:
+                raise NotFound("post item not found")
+            await uow.delete_queue_item(item=post_item)
+            await uow.commit()
+
+        return school_member.post_queue

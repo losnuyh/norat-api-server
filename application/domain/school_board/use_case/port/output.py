@@ -41,6 +41,10 @@ class SchoolStoreOutputPort(UnitOfWork, ABC):
     async def save_queue_item(self, *, item: QueueItem):
         ...
 
+    @abstractmethod
+    async def delete_queue_item(self, *, item: QueueItem):
+        ...
+
 
 class UserOutputPort(Protocol):
     async def get_user_by_user_id(self, *, user_id: int) -> User:

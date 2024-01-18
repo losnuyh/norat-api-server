@@ -47,3 +47,7 @@ class SchoolBoardInputPort(ABC):
     @abstractmethod
     async def get_user_queue(self, *, school_code: str, grade: int, user_id: int) -> list[QueueItem]:
         ...
+
+    @abstractmethod
+    async def delete_user_post_in_queue(self, *, school_code: str, grade: int, user_id: int, post_item_id: int):
+        ...
