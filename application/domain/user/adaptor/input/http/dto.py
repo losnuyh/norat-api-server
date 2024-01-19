@@ -43,8 +43,6 @@ class UserResponse(BaseModel):
     account: str
     birth: date
     verified_at: datetime | None = None
-    school_name: str | None = None
-    school_grade: int | None = None
 
     privacy_policy_agreed_at: datetime | None = None
     terms_policy_agreed_at: datetime | None = None

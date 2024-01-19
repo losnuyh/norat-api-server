@@ -166,6 +166,7 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
             status_code=status.HTTP_200_OK,
             responses={
                 status.HTTP_200_OK: {
+                    "model": UserResponse,
                     "description": "성공",
                 },
                 status.HTTP_400_BAD_REQUEST: {
