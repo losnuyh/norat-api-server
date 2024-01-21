@@ -1,4 +1,4 @@
-from .post import Post
+from .post import Post, PublicPost
 from .queue import QueueItem
 from .school import School, SchoolMember
 
@@ -7,4 +7,5 @@ __all__ = [
     "SchoolMember",
     "Post",
     "QueueItem",
+    "PublicPost",
 ]

@@ -4,10 +4,10 @@ from typing import Sequence
 from sqlalchemy import delete, select
 from sqlalchemy.dialects.mysql import insert
 
-from application.domain.school_board.model import Post, QueueItem, SchoolMember
+from application.domain.school_board.model import Post, PublicPost, QueueItem, SchoolMember
 from application.domain.school_board.use_case.port.output import SchoolStoreOutputPort
 
-from .table import QueueItemTable, SchoolMemberCountTable, SchoolMemberTable
+from .table import PublicPostTable, QueueItemTable, SchoolMemberCountTable, SchoolMemberTable
 
 
 class SchoolStoreOutputAdaptor(SchoolStoreOutputPort):
@@ -132,3 +132,34 @@ class SchoolStoreOutputAdaptor(SchoolStoreOutputPort):
     async def delete_queue_item(self, *, item: QueueItem):
         stmt = delete(QueueItemTable).where(QueueItemTable.id == item.id)
         await self.session.execute(stmt)
+
+    async def query_public_posts(
+        self, *, school_code: str, grade: int, last_post_id: int | None = None
+    ) -> list[PublicPost]:
+        stmt = (
+            select(PublicPostTable)
+            .where(PublicPostTable.school_code == school_code)
+            .where(PublicPostTable.grade == grade)
+        )
+        if last_post_id is not None:
+            stmt = stmt.where(PublicPostTable.id < last_post_id)
+
+        stmt = stmt.order_by(-PublicPostTable.id).limit(20)
+        result: Sequence[PublicPostTable] = (await self.session.scalars(stmt)).all()
+
+        items: list[PublicPost] = []
+        for data in result:
+            items.append(
+                PublicPost(
+                    id=data.id,
+                    school_code=data.school_code,
+                    grade=data.grade,
+                    title=data.title,
+                    content=data.content,
+                    writer_id=data.writer_user_id,
+                    writer_random_nickname=data.writer_random_nickname,
+                    created_at=data.created_at.replace(tzinfo=timezone.utc),
+                    published_at=data.published_at.replace(tzinfo=timezone.utc),  # TODO: replace 체크
+                ),
+            )
+        return items

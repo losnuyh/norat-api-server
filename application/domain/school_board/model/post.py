@@ -19,11 +19,11 @@ class _PostBase:
 class Post(_PostBase):
     id: int | None = None
 
-    def for_public(self) -> PostForPublic:
-        return PostForPublic(published_at=datetime.now(tz=timezone.utc), **asdict(self))
+    def for_public(self) -> PublicPost:
+        return PublicPost(published_at=datetime.now(tz=timezone.utc), **asdict(self))
 
 
 @dataclass
-class PostForPublic(_PostBase):
+class PublicPost(_PostBase):
     published_at: datetime
     id: int | None = None

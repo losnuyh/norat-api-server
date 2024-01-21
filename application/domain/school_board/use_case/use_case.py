@@ -1,5 +1,5 @@
 from application.domain.school_board.error import AlreadySchoolMember, SchoolBoardNotOpen
-from application.domain.school_board.model import QueueItem, School
+from application.domain.school_board.model import PublicPost, QueueItem, School
 from application.domain.school_board.use_case.port.input import SchoolBoardInfo, SchoolBoardInputPort, UserSchoolInfo
 from application.domain.school_board.use_case.port.output import (
     SchoolSearchOutputPort,
@@ -119,3 +119,14 @@ class SchoolBoardUseCase(SchoolBoardInputPort):
             await uow.commit()
 
         return school_member.post_queue
+
+    async def get_posts(
+        self, *, user_id: int, school_code: str, grade: int, last_post_id: int | None = None
+    ) -> list[PublicPost]:
+        async with self.school_store_output(read_only=True) as uow:
+            school_member = await uow.get_user_school_member(user_id=user_id)
+            if school_member is None or not school_member.is_member(school_code=school_code, grade=grade):
+                raise PermissionDenied("invalid request")
+
+            posts = await uow.query_public_posts(school_code=school_code, grade=grade, last_post_id=last_post_id)
+            return posts

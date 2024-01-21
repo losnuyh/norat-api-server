@@ -95,3 +95,14 @@ class QueueItemTable(PostData, Base):
         kw_only=True,
     )
     __table_args__ = (Index("queue_item_per_user_idx", "writer_user_id", "school_code", "grade"),)
+
+
+class PublicPostTable(PostData, Base):
+    __tablename__ = "public_post"
+
+    id: Mapped[int] = mapped_column(primary_key=True, kw_only=True)
+    published_at: Mapped[datetime] = mapped_column(
+        nullable=False,
+        kw_only=True,
+    )
+    __table_args__ = (Index("public_post_idx", "id", "school_code", "grade"),)

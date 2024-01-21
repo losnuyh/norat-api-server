@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from application.domain.school_board.model import QueueItem, School
+from application.domain.school_board.model import PublicPost, QueueItem, School
 
 
 @dataclass(kw_only=True)
@@ -50,4 +50,10 @@ class SchoolBoardInputPort(ABC):
 
     @abstractmethod
     async def delete_user_post_in_queue(self, *, school_code: str, grade: int, user_id: int, post_item_id: int):
+        ...
+
+    @abstractmethod
+    async def get_posts(
+        self, *, user_id: int, school_code: str, grade: int, last_post_id: int | None = None
+    ) -> list[PublicPost]:
         ...

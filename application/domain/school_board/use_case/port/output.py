@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Protocol
 
-from application.domain.school_board.model import Post, QueueItem, School, SchoolMember
+from application.domain.school_board.model import Post, PublicPost, QueueItem, School, SchoolMember
 from application.domain.user.model import User
 from application.infra.unit_of_work.sqlalchemy import UnitOfWork
 
@@ -43,6 +43,12 @@ class SchoolStoreOutputPort(UnitOfWork, ABC):
 
     @abstractmethod
     async def delete_queue_item(self, *, item: QueueItem):
+        ...
+
+    @abstractmethod
+    async def query_public_posts(
+        self, *, school_code: str, grade: int, last_post_id: int | None = None
+    ) -> list[PublicPost]:
         ...
 
 

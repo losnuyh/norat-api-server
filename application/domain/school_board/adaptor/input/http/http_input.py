@@ -8,6 +8,7 @@ from application.infra.fastapi import WithFastAPIRouter
 from application.infra.fastapi.auth import get_authenticated_user
 
 from .dto import (
+    PostsResponse,
     QueueItemResponse,
     RegisterSchoolMemberRequest,
     SchoolBoardInfoResponse,
@@ -282,3 +283,42 @@ class SchoolBoardHttpInputAdaptor(WithFastAPIRouter):
                 post_item_id=post_item_id,
             )
             return {"message": "success"}
+
+    def get_posts(self):
+        @school_board_router.get(
+            path="/{school_code}/grade/{grade}/post333",
+            tags=["post"],
+            summary="게시판 글 가져오기",
+            description="</br>".join(
+                [
+                    "게시판에 공개된 글을 가져옵니다.",
+                ],
+            ),
+            status_code=status.HTTP_200_OK,
+            responses={
+                status.HTTP_200_OK: {
+                    "model": PostsResponse,
+                    "description": "게시글 목록",
+                },
+                status.HTTP_404_NOT_FOUND: {
+                    "description": "찾을 수 없는 정보",
+                },
+            },
+        )
+        async def handler(
+            request_user_id: Annotated[int, Depends(get_authenticated_user)],
+            school_code: Annotated[str, Path()],
+            grade: Annotated[int, Path()],
+            last_post_id: Annotated[int | None, Query()] = None,
+        ):
+            print("last_post_id ->", last_post_id)
+            posts = await self.input.get_posts(
+                school_code=school_code,
+                grade=grade,
+                user_id=request_user_id,
+                last_post_id=last_post_id,
+            )
+            return PostsResponse(
+                posts=posts,
+                cursor=last_post_id,
+            )
