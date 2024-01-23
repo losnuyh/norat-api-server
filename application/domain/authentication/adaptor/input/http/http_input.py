@@ -57,6 +57,9 @@ class AuthenticationHttpInputAdaptor(WithFastAPIRouter):
                 status.HTTP_400_BAD_REQUEST: {
                     "description": "잘못된 요청",
                 },
+                status.HTTP_404_NOT_FOUND: {
+                    "description": "찾을 수 없는 정보",
+                },
             },
         )
         async def handler(phone: Annotated[str, Query(min_length=11, max_length=11)]):
@@ -84,7 +87,10 @@ class AuthenticationHttpInputAdaptor(WithFastAPIRouter):
                     "description": "인증 성공",
                 },
                 status.HTTP_400_BAD_REQUEST: {
-                    "description": "인증 실패",
+                    "description": "잘못된 요청",
+                },
+                status.HTTP_404_NOT_FOUND: {
+                    "description": "찾을 수 없는 정보",
                 },
             },
         )
@@ -116,7 +122,10 @@ class AuthenticationHttpInputAdaptor(WithFastAPIRouter):
                     "description": "로그인 성공",
                 },
                 status.HTTP_400_BAD_REQUEST: {
-                    "description": "로그인 실패",
+                    "description": "잘못된 요청",
+                },
+                status.HTTP_404_NOT_FOUND: {
+                    "description": "찾을 수 없는 정보",
                 },
             },
         )
@@ -145,7 +154,10 @@ class AuthenticationHttpInputAdaptor(WithFastAPIRouter):
                     "description": "재발급 성공",
                 },
                 status.HTTP_400_BAD_REQUEST: {
-                    "description": "재발급 실패",
+                    "description": "잘못된 요청",
+                },
+                status.HTTP_404_NOT_FOUND: {
+                    "description": "찾을 수 없는 정보",
                 },
             },
         )
@@ -176,7 +188,10 @@ class AuthenticationHttpInputAdaptor(WithFastAPIRouter):
                     "description": "성공",
                 },
                 status.HTTP_400_BAD_REQUEST: {
-                    "description": "실패",
+                    "description": "잘못된 요청",
+                },
+                status.HTTP_404_NOT_FOUND: {
+                    "description": "찾을 수 없는 정보",
                 },
             },
         )

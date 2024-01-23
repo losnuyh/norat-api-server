@@ -18,7 +18,7 @@ from application.domain.school_board.adaptor.input.http import (
 )
 from application.domain.school_board.adaptor.output import SchoolSearchOutputAdaptor
 from application.domain.school_board.adaptor.output.store import SchoolStoreOutputAdaptor
-from application.domain.school_board.error import AlreadySchoolMember, SchoolBoardNotOpen
+from application.domain.school_board.error import AlreadySchoolMember, SchoolBoardNotOpen, TooManyPostIntQueue
 from application.domain.school_board.use_case import SchoolBoardUseCase
 from application.domain.user.adaptor.input.http import UserHttpInputAdaptor, user_router
 from application.domain.user.adaptor.output.certification import CertificationOutputAdaptor
@@ -39,7 +39,6 @@ def setup_exception_handlers(application: FastAPI):
     @application.exception_handler(PermissionDenied)
     @application.exception_handler(AuthenticationFail)
     @application.exception_handler(AccountIsDuplicated)
-    @application.exception_handler(PasswordNotMatched)
     @application.exception_handler(PasswordValidationFail)
     @application.exception_handler(CertificationIsWrong)
     @application.exception_handler(InvalidData)
@@ -47,6 +46,7 @@ def setup_exception_handlers(application: FastAPI):
     @application.exception_handler(FaceVerificationFail)
     @application.exception_handler(AlreadySchoolMember)
     @application.exception_handler(SchoolBoardNotOpen)
+    @application.exception_handler(TooManyPostIntQueue)
     def handle_bad_request(request: Request, exc: AuthenticationFail):
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -54,6 +54,7 @@ def setup_exception_handlers(application: FastAPI):
         )
 
     @application.exception_handler(NotFound)
+    @application.exception_handler(PasswordNotMatched)
     def handle_not_found_request(request: Request, exc: AuthenticationFail):
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,

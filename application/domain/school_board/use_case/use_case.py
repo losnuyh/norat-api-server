@@ -1,4 +1,4 @@
-from application.domain.school_board.error import AlreadySchoolMember, SchoolBoardNotOpen
+from application.domain.school_board.error import AlreadySchoolMember, SchoolBoardNotOpen, TooManyPostIntQueue
 from application.domain.school_board.model import PublicPost, QueueItem, School
 from application.domain.school_board.use_case.port.input import SchoolBoardInfo, SchoolBoardInputPort, UserSchoolInfo
 from application.domain.school_board.use_case.port.output import (
@@ -84,7 +84,7 @@ class SchoolBoardUseCase(SchoolBoardInputPort):
             school_member.set_queue_loader(loader=uow)
             await school_member.load_queue_items()
             if len(school_member.post_queue) >= 5:
-                raise Exception  # TODO: ERROR CLASS
+                raise TooManyPostIntQueue(f"post in queue : {len(school_member.post_queue)}")
             queueing_item = school_member.write_post_and_queueing(
                 title=title,
                 content=content,

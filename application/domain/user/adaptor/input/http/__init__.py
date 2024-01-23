@@ -40,6 +40,12 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
             response_description="아이디 중복 여부를 확인합니다.",
             responses={
                 status.HTTP_200_OK: {"model": CheckUserAccountDuplicationResponse, "description": "유저 아이디 중복 체크 결과"},
+                status.HTTP_400_BAD_REQUEST: {
+                    "description": "잘못된 요청",
+                },
+                status.HTTP_404_NOT_FOUND: {
+                    "description": "찾을 수 없는 정보",
+                },
             },
         )
         async def handler(account: Annotated[str, Query()]):
@@ -63,7 +69,10 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
                     "description": "가입 성공",
                 },
                 status.HTTP_400_BAD_REQUEST: {
-                    "description": "가입 실패",
+                    "description": "잘못된 요청",
+                },
+                status.HTTP_404_NOT_FOUND: {
+                    "description": "찾을 수 없는 정보",
                 },
             },
         )
@@ -103,7 +112,10 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
                     "description": "성공",
                 },
                 status.HTTP_400_BAD_REQUEST: {
-                    "description": "실패",
+                    "description": "잘못된 요청",
+                },
+                status.HTTP_404_NOT_FOUND: {
+                    "description": "찾을 수 없는 정보",
                 },
             },
         )
@@ -137,7 +149,10 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
                     "description": "성공",
                 },
                 status.HTTP_400_BAD_REQUEST: {
-                    "description": "실패",
+                    "description": "잘못된 요청",
+                },
+                status.HTTP_404_NOT_FOUND: {
+                    "description": "찾을 수 없는 정보",
                 },
             },
         )
@@ -170,7 +185,10 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
                     "description": "성공",
                 },
                 status.HTTP_400_BAD_REQUEST: {
-                    "description": "실패",
+                    "description": "잘못된 요청",
+                },
+                status.HTTP_404_NOT_FOUND: {
+                    "description": "찾을 수 없는 정보",
                 },
             },
         )
@@ -219,7 +237,10 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
                     "description": "성공",
                 },
                 status.HTTP_400_BAD_REQUEST: {
-                    "description": "실패",
+                    "description": "잘못된 요청",
+                },
+                status.HTTP_404_NOT_FOUND: {
+                    "description": "찾을 수 없는 정보",
                 },
             },
         )
@@ -254,7 +275,10 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
                     "description": "성공",
                 },
                 status.HTTP_400_BAD_REQUEST: {
-                    "description": "실패",
+                    "description": "잘못된 요청",
+                },
+                status.HTTP_404_NOT_FOUND: {
+                    "description": "찾을 수 없는 정보",
                 },
             },
         )
@@ -289,7 +313,10 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
                     "description": "성공",
                 },
                 status.HTTP_400_BAD_REQUEST: {
-                    "description": "실패",
+                    "description": "잘못된 요청",
+                },
+                status.HTTP_404_NOT_FOUND: {
+                    "description": "찾을 수 없는 정보",
                 },
             },
         )
@@ -326,7 +353,10 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
                     "description": "성공",
                 },
                 status.HTTP_400_BAD_REQUEST: {
-                    "description": "실패",
+                    "description": "잘못된 요청",
+                },
+                status.HTTP_404_NOT_FOUND: {
+                    "description": "찾을 수 없는 정보",
                 },
             },
         )
@@ -364,7 +394,10 @@ class UserHttpInputAdaptor(WithFastAPIRouter):
                     "description": "성공",
                 },
                 status.HTTP_400_BAD_REQUEST: {
-                    "description": "실패",
+                    "description": "잘못된 요청",
+                },
+                status.HTTP_404_NOT_FOUND: {
+                    "description": "찾을 수 없는 정보",
                 },
             },
         )

@@ -34,6 +34,7 @@ class SchoolBoardHttpInputAdaptor(WithFastAPIRouter):
                 [
                     "학교 이름을 검색합니다.",
                     "검색 키워드는 최소 2글자, 최대 10글자입니다.",
+                    "응답은 결과는 5개만 내려갑니다.",
                 ],
             ),
             status_code=status.HTTP_200_OK,
@@ -45,6 +46,9 @@ class SchoolBoardHttpInputAdaptor(WithFastAPIRouter):
                 },
                 status.HTTP_400_BAD_REQUEST: {
                     "description": "잘못된 요청",
+                },
+                status.HTTP_404_NOT_FOUND: {
+                    "description": "찾을 수 없는 정보",
                 },
             },
         )
@@ -71,6 +75,9 @@ class SchoolBoardHttpInputAdaptor(WithFastAPIRouter):
                 },
                 status.HTTP_400_BAD_REQUEST: {
                     "description": "잘못된 요청",
+                },
+                status.HTTP_404_NOT_FOUND: {
+                    "description": "존재하지 않는 리소스 요청",
                 },
             },
         )
@@ -106,6 +113,9 @@ class SchoolBoardHttpInputAdaptor(WithFastAPIRouter):
                 status.HTTP_400_BAD_REQUEST: {
                     "description": "잘못된 요청",
                 },
+                status.HTTP_404_NOT_FOUND: {
+                    "description": "찾을 수 없는 정보",
+                },
             },
         )
         async def handler(
@@ -138,6 +148,9 @@ class SchoolBoardHttpInputAdaptor(WithFastAPIRouter):
                 status.HTTP_200_OK: {
                     "model": UserSchoolInfoResponse,
                     "description": "발송 성공",
+                },
+                status.HTTP_400_BAD_REQUEST: {
+                    "description": "잘못된 요청",
                 },
                 status.HTTP_404_NOT_FOUND: {
                     "description": "찾을 수 없는 정보",
@@ -176,6 +189,9 @@ class SchoolBoardHttpInputAdaptor(WithFastAPIRouter):
                 status.HTTP_200_OK: {
                     "model": QueueItemResponse,
                     "description": "발송 성공",
+                },
+                status.HTTP_400_BAD_REQUEST: {
+                    "description": "잘못된 요청",
                 },
                 status.HTTP_404_NOT_FOUND: {
                     "description": "찾을 수 없는 정보",
@@ -222,6 +238,9 @@ class SchoolBoardHttpInputAdaptor(WithFastAPIRouter):
                     "model": list[QueueItemResponse],
                     "description": "발송 성공",
                 },
+                status.HTTP_400_BAD_REQUEST: {
+                    "description": "잘못된 요청",
+                },
                 status.HTTP_404_NOT_FOUND: {
                     "description": "찾을 수 없는 정보",
                 },
@@ -265,6 +284,9 @@ class SchoolBoardHttpInputAdaptor(WithFastAPIRouter):
                 status.HTTP_200_OK: {
                     "description": "제거 성공",
                 },
+                status.HTTP_400_BAD_REQUEST: {
+                    "description": "잘못된 요청",
+                },
                 status.HTTP_404_NOT_FOUND: {
                     "description": "찾을 수 없는 정보",
                 },
@@ -299,6 +321,9 @@ class SchoolBoardHttpInputAdaptor(WithFastAPIRouter):
                 status.HTTP_200_OK: {
                     "model": PostsResponse,
                     "description": "게시글 목록",
+                },
+                status.HTTP_400_BAD_REQUEST: {
+                    "description": "잘못된 요청",
                 },
                 status.HTTP_404_NOT_FOUND: {
                     "description": "찾을 수 없는 정보",
