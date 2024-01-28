@@ -308,7 +308,7 @@ class SchoolBoardHttpInputAdaptor(WithFastAPIRouter):
 
     def get_posts(self):
         @school_board_router.get(
-            path="/{school_code}/grade/{grade}/post333",
+            path="/{school_code}/grade/{grade}/post",
             tags=["post"],
             summary="게시판 글 가져오기",
             description="</br>".join(
