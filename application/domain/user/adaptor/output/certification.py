@@ -25,7 +25,8 @@ class CertificationOutputAdaptor(CertificationOutputPort):
             )
             response_body = await response.json()
             access_token = response_body["response"]["access_token"]
-
+            print("access_token>>", access_token)
+            print(f"url: https://api.iamport.kr/certifications/${imp_uid}")
             response = await session.get(
                 f"https://api.iamport.kr/certifications/${imp_uid}",
                 headers={
