@@ -70,6 +70,9 @@ class UserUseCase(UserInputPort):
             return user
 
     async def certificate_self(self, *, user_id: int, imp_uid: str):
+        print("start certificate_self")
+        print("user_id: ", user_id)
+        print("imp_uid: ", imp_uid)
         async with self.user_store(read_only=True) as uow:
             user = await uow.get_user_by_user_id(user_id=user_id)
             if user is None:
@@ -90,6 +93,9 @@ class UserUseCase(UserInputPort):
             await uow.commit()
 
     async def certificate_guardian(self, *, user_id: int, imp_uid: str):
+        print("start certificate_guardian")
+        print("user_id: ", user_id)
+        print("imp_uid: ", imp_uid)
         async with self.user_store(read_only=True) as uow:
             user = await uow.get_user_by_user_id(user_id=user_id)
             if user is None:
