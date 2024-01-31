@@ -6,7 +6,6 @@ from starlette import status
 
 from application.domain.user.model import CertificationInfo
 from application.domain.user.use_case.port.output import CertificationOutputPort
-from application.error import ExternalVendorError
 
 
 class CertificationOutputAdaptor(CertificationOutputPort):
@@ -39,7 +38,7 @@ class CertificationOutputAdaptor(CertificationOutputPort):
             response_body = await response.json()
             if response.status != status.HTTP_200_OK:
                 logging.error(response_body)
-                raise ExternalVendorError("포트원 장애")
+                return None
 
         """
         {

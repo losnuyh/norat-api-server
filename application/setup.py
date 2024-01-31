@@ -31,7 +31,7 @@ from application.domain.user.error import (
     FaceVerificationFail,
 )
 from application.domain.user.use_case import UserUseCase
-from application.error import ExternalVendorError, InvalidData, NotFound, PermissionDenied, ServerError
+from application.error import InvalidData, NotFound, PermissionDenied, ServerError
 from application.infra.sms import SMSSender
 
 
@@ -47,7 +47,6 @@ def setup_exception_handlers(application: FastAPI):
     @application.exception_handler(AlreadySchoolMember)
     @application.exception_handler(SchoolBoardNotOpen)
     @application.exception_handler(TooManyPostIntQueue)
-    @application.exception_handler(ExternalVendorError)
     def handle_bad_request(request: Request, exc: AuthenticationFail):
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
