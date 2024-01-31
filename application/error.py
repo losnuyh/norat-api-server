@@ -12,3 +12,7 @@ class InvalidData(Exception):
 
 class ServerError(Exception):
     ...
+
+
+class ExternalVendorError(Exception):
+    ...
