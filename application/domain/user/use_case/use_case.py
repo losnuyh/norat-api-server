@@ -107,9 +107,10 @@ class UserUseCase(UserInputPort):
                 certification_type=GUARDIAN_Certification,
                 certification=certification_info,
             )
+            await uow.save_user(user=user)
             await uow.commit()
 
-    async def agree_terms(self, *, user_id: int, agree_marketing: bool, agree_push: bool):
+    async def agree_terms(self,*, user_id: int, agree_marketing: bool, agree_push: bool):
         async with self.user_store() as uow:
             user = await uow.get_user_by_user_id(user_id=user_id)
             if user is None:
