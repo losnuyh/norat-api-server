@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from sqlalchemy import Select, delete, select
 from sqlalchemy.dialects.mysql import insert
 
-from application.domain.user.model import CertificationInfo, CertificationType, FaceVerificationRequest, User
+from application.domain.user.model import CertificationInfo, CertificationType, FaceVerificationRequest, User, FaceVerificationStatus
 from application.domain.user.use_case.port.output import UserStoreOutputPort
 
 from .table import CertificationTable, FaceVerificationRequestTable, UserTable
@@ -118,6 +118,7 @@ class UserStoreAdaptor(UserStoreOutputPort):
         stmt = (
             select(FaceVerificationRequestTable)
             .where(FaceVerificationRequestTable.user_id == user_id)
+            .where(FaceVerificationRequestTable.status != FaceVerificationStatus.REJECTED.value)
             .order_by(-FaceVerificationRequestTable.id)
             .limit(1)
         )
