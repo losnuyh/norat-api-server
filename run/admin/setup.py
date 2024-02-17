@@ -5,14 +5,12 @@ from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 from sqlalchemy.ext.asyncio import AsyncEngine
 from starlette import status
 
+from application.domain.admin.use_case.use_case import AdminUseCase
 from application.domain.authentication.adaptor.output.sms_sender import SMSCodeSenderOutputAdaptor
 from application.domain.authentication.adaptor.output.store import AuthenticationStoreAdaptor
 from application.domain.authentication.error import AuthenticationFail, PasswordNotMatched, PasswordValidationFail
 from application.domain.authentication.use_case import AuthenticationUseCase
-from application.domain.school_board.adaptor.output import SchoolSearchOutputAdaptor
-from application.domain.school_board.adaptor.output.store import SchoolStoreOutputAdaptor
 from application.domain.school_board.error import AlreadySchoolMember, SchoolBoardNotOpen, TooManyPostIntQueue
-from application.domain.school_board.use_case import SchoolBoardUseCase
 from application.domain.user.adaptor.output.certification import CertificationOutputAdaptor
 from application.domain.user.adaptor.output.s3 import UserS3OutputAdaptor
 from application.domain.user.adaptor.output.store import UserStoreAdaptor
@@ -26,13 +24,11 @@ from application.domain.user.use_case import UserUseCase
 from application.error import InvalidData, NotFound, PermissionDenied, ServerError
 from application.infra.sms import SMSSender
 from common.config import app_config as common_config
-from run.main.config import app_config as main_config
-from run.main.http.authentication import AuthenticationHttpInputAdaptor, authentication_router
-from run.main.http.school_board import SchoolBoardHttpInputAdaptor, school_board_router, user_router_in_school_board
-from run.main.http.user import UserHttpInputAdaptor, user_router
+from run.admin.http.admin.input import AdminHttpInputAdaptor, admin_router
 
 
 def setup_exception_handlers(application: FastAPI):
+    # TODO: main앱이랑 중복됨
     @application.exception_handler(PermissionDenied)
     @application.exception_handler(AuthenticationFail)
     @application.exception_handler(AccountIsDuplicated)
@@ -91,9 +87,6 @@ def setup_application(
             readonly_engine=readonly_engine,
         ),
     )
-    authentication_http_application = AuthenticationHttpInputAdaptor(
-        input_adaptor=authentication_use_case,
-    )
     user_use_case = UserUseCase(
         user_store=UserStoreAdaptor(
             engine=db_engine,
@@ -109,31 +102,16 @@ def setup_application(
             bucket_name=common_config.USER_UPLOAD_S3_BUCKET_NAME,
         ),
     )
-    user_http_application = UserHttpInputAdaptor(
-        input=user_use_case,
-    )
 
-    school_use_case = SchoolBoardUseCase(
-        search_output=SchoolSearchOutputAdaptor(
-            key=main_config.NEIS_KEY,
-        ),
-        store_output=SchoolStoreOutputAdaptor(
-            engine=db_engine,
-            readonly_engine=readonly_engine,
-        ),
+    admin_use_case = AdminUseCase(
         user_output=user_use_case,
     )
-    school_http_application = SchoolBoardHttpInputAdaptor(
-        input_adaptor=school_use_case,
+    admin_http_application = AdminHttpInputAdaptor(
+        input=admin_use_case,
     )
 
-    user_http_application.start()
-    authentication_http_application.start()
-    school_http_application.start()
+    admin_http_application.start()
 
-    app.include_router(authentication_router, prefix="/authentication")
-    app.include_router(user_router, prefix="/user")
-    app.include_router(user_router_in_school_board, prefix="/user")
-    app.include_router(school_board_router, prefix="/school")
+    app.include_router(admin_router, prefix="/admin")
 
     setup_exception_handlers(app)
