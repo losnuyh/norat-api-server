@@ -18,8 +18,6 @@ class ApplicationConfigScheme:
     COOL_SMS_API_KEY: str
     COOL_SMS_SEND_PHONE_NUMBER: str
 
-    JWT_SIGNING_PRIVATE_KEY: str
-
     NEIS_KEY: str
 
     PORT_ONE_KEY: str

@@ -6,7 +6,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException, Query, status
 
 from application.domain.authentication.use_case.port.input import AuthenticationInputPort
 from application.infra.fastapi import WithFastAPIRouter
-from application.infra.fastapi.auth import get_authenticated_user
+from run.main.auth import get_authenticated_user
 
 from .dto import (
     ChangePasswordRequest,

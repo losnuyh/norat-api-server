@@ -3,7 +3,13 @@ from datetime import datetime, timezone
 from sqlalchemy import Select, delete, select
 from sqlalchemy.dialects.mysql import insert
 
-from application.domain.user.model import CertificationInfo, CertificationType, FaceVerificationRequest, User, FaceVerificationStatus
+from application.domain.user.model import (
+    CertificationInfo,
+    CertificationType,
+    FaceVerificationRequest,
+    FaceVerificationStatus,
+    User,
+)
 from application.domain.user.use_case.port.output import UserStoreOutputPort
 
 from .table import CertificationTable, FaceVerificationRequestTable, UserTable
@@ -66,10 +72,7 @@ class UserStoreAdaptor(UserStoreOutputPort):
             marketing_policy_agreed_at=user.marketing_policy_agreed_at,
             push_agreed_at=user.push_agreed_at,
         )
-        stmt = insert(UserTable).values(
-            created_at=now,
-            **user_row
-        ).on_duplicate_key_update(**user_row)
+        stmt = insert(UserTable).values(created_at=now, **user_row).on_duplicate_key_update(**user_row)
         result = await self.session.execute(stmt)
         user.id, *_ = result.inserted_primary_key_rows[0]
         return user
@@ -122,6 +125,22 @@ class UserStoreAdaptor(UserStoreOutputPort):
             .order_by(-FaceVerificationRequestTable.id)
             .limit(1)
         )
+        data: FaceVerificationRequestTable = await self.session.scalar(stmt)
+        if data is None:
+            return None
+        return FaceVerificationRequest(
+            id=data.id,
+            user_id=data.user_id,
+            s3_key=data.s3_key,
+            status=data.status,
+            requested_at=data.requested_at,
+            changed_at=data.changed_at,
+        )
+
+    async def get_user_face_verification_request(
+        self, *, verification_request_id: int
+    ) -> FaceVerificationRequest | None:
+        stmt = select(FaceVerificationRequestTable).where(FaceVerificationRequestTable.id == verification_request_id)
         data: FaceVerificationRequestTable = await self.session.scalar(stmt)
         if data is None:
             return None

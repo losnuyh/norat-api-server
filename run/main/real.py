@@ -1,8 +1,9 @@
 from application.infra.fastapi import app
 from application.infra.rdb import create_second_engine
 from application.infra.sms.cool_sms import CoolSMSSender
-from application.setup import setup_application
-from .config import app_config
+from run.main.config import app_config
+
+from .setup import setup_application
 
 engine = create_second_engine(
     user_name=app_config.WRITE_DB_USER_NAME,

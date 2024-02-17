@@ -5,7 +5,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from jwt.exceptions import DecodeError, InvalidTokenError
 
-from application.jwt.token_type import PhoneAuthenticationTokenPayload, UserAuthenticationTokenPayload
+from common.util.token.jwt.token_type import PhoneAuthenticationTokenPayload, UserAuthenticationTokenPayload
 
 
 class JwtTokenManager:

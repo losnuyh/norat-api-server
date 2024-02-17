@@ -5,22 +5,16 @@ from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 from sqlalchemy.ext.asyncio import AsyncEngine
 from starlette import status
 
-from application.config import app_config
-from application.domain.authentication.adaptor.input.http import AuthenticationHttpInputAdaptor, authentication_router
+from application.domain.admin.adpator.input.http import AdminHttpInputAdaptor, admin_router
+from application.domain.admin.use_case.use_case import AdminUseCase
 from application.domain.authentication.adaptor.output.sms_sender import SMSCodeSenderOutputAdaptor
 from application.domain.authentication.adaptor.output.store import AuthenticationStoreAdaptor
 from application.domain.authentication.error import AuthenticationFail, PasswordNotMatched, PasswordValidationFail
 from application.domain.authentication.use_case import AuthenticationUseCase
-from application.domain.school_board.adaptor.input.http import (
-    SchoolBoardHttpInputAdaptor,
-    school_board_router,
-    user_router_in_school_board,
-)
 from application.domain.school_board.adaptor.output import SchoolSearchOutputAdaptor
 from application.domain.school_board.adaptor.output.store import SchoolStoreOutputAdaptor
 from application.domain.school_board.error import AlreadySchoolMember, SchoolBoardNotOpen, TooManyPostIntQueue
 from application.domain.school_board.use_case import SchoolBoardUseCase
-from application.domain.user.adaptor.input.http import UserHttpInputAdaptor, user_router
 from application.domain.user.adaptor.output.certification import CertificationOutputAdaptor
 from application.domain.user.adaptor.output.s3 import UserS3OutputAdaptor
 from application.domain.user.adaptor.output.store import UserStoreAdaptor
@@ -33,6 +27,10 @@ from application.domain.user.error import (
 from application.domain.user.use_case import UserUseCase
 from application.error import InvalidData, NotFound, PermissionDenied, ServerError
 from application.infra.sms import SMSSender
+from run.main.config import app_config
+from run.main.http.authentication import AuthenticationHttpInputAdaptor, authentication_router
+from run.main.http.school_board import SchoolBoardHttpInputAdaptor, school_board_router, user_router_in_school_board
+from run.main.http.user import UserHttpInputAdaptor, user_router
 
 
 def setup_exception_handlers(application: FastAPI):
@@ -130,13 +128,22 @@ def setup_application(
         input_adaptor=school_use_case,
     )
 
+    admin_use_case = AdminUseCase(
+        user_output=user_use_case,
+    )
+    admin_http_application = AdminHttpInputAdaptor(
+        input=admin_use_case,
+    )
+
     user_http_application.start()
     authentication_http_application.start()
     school_http_application.start()
+    admin_http_application.start()
 
     app.include_router(authentication_router, prefix="/authentication")
     app.include_router(user_router, prefix="/user")
     app.include_router(user_router_in_school_board, prefix="/user")
     app.include_router(school_board_router, prefix="/school")
+    app.include_router(admin_router, prefix="/admin")
 
     setup_exception_handlers(app)

@@ -3,7 +3,8 @@ from dataclasses import fields
 
 from boto3 import client
 
-from application.config_scheme import ApplicationConfigScheme
+from common.config_scheme import CommonConfigScheme
+from run.main.config_scheme import ApplicationConfigScheme
 
 parser = argparse.ArgumentParser(
     prog=".env file generator",
@@ -15,7 +16,9 @@ args = parser.parse_args()
 env = args.env
 file_destination = args.destination
 ssm_client = client("ssm")
-names = [f"/second/{env}/{key.name}" for key in fields(ApplicationConfigScheme)]
+names = [f"/second/MAIN/{env}/{key.name}" for key in fields(ApplicationConfigScheme)]
+names += [f"/second/COMMON/{env}/{key.name}" for key in fields(CommonConfigScheme)]
+print("names..", names)
 
 size = 10
 cursor = 0
@@ -26,6 +29,7 @@ while True:
         Names=names[cursor : cursor + size],
         WithDecryption=True,
     )["Parameters"]
+    print("????", parameters)
     for param in parameters:
         values[param["Name"].rsplit("/", maxsplit=1)[-1]] = param["Value"]
     cursor += size

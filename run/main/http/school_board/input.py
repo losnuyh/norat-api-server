@@ -5,7 +5,7 @@ from fastapi import APIRouter, Body, Depends, Path, Query, status
 from application.domain.school_board.use_case.port.input import SchoolBoardInputPort
 from application.error import PermissionDenied
 from application.infra.fastapi import WithFastAPIRouter
-from application.infra.fastapi.auth import get_authenticated_user
+from run.main.auth import get_authenticated_user
 
 from .dto import (
     PostsResponse,

@@ -5,7 +5,7 @@ from secrets import token_hex
 import bcrypt
 
 from application.domain.authentication.error import AuthenticationFail, PasswordNotMatched, PasswordValidationFail
-from application.jwt import jwt_token_manager
+from common.util.token.jwt import jwt_token_manager
 
 from .token import AuthToken
 

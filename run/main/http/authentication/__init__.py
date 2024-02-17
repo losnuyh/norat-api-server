@@ -1,4 +1,4 @@
-from .http_input import AuthenticationHttpInputAdaptor, authentication_router
+from .input import AuthenticationHttpInputAdaptor, authentication_router
 
 __all__ = [
     "AuthenticationHttpInputAdaptor",

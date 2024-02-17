@@ -2,8 +2,8 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 
 from application.domain.authentication.error import AuthenticationFail
-from application.jwt import jwt_token_manager
-from application.jwt.token_type import PhoneAuthenticationTokenPayload
+from common.util.token.jwt import jwt_token_manager
+from common.util.token.jwt.token_type import PhoneAuthenticationTokenPayload
 
 from .token import PhoneToken
 

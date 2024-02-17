@@ -4,8 +4,8 @@ from fastapi import Depends, Query
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt.exceptions import InvalidTokenError
 
-from application.jwt import jwt_token_manager
-from application.jwt.token_type import PhoneAuthenticationTokenPayload, UserAuthenticationTokenPayload
+from common.util.token.jwt import jwt_token_manager
+from common.util.token.jwt.token_type import PhoneAuthenticationTokenPayload, UserAuthenticationTokenPayload
 
 oauth2_scheme = HTTPBearer()
 

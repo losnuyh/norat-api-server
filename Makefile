@@ -1,9 +1,8 @@
 run-local:
-	uvicorn application.local:app --reload
+	uvicorn run.main.local:app --reload
 
 run-local-with-worker:
-	uvicorn application.local:app --workers=4
-
+	uvicorn run.main.local:app --workers=4
 
 api_function_zip:
 	rm -rf ./_api_package || true

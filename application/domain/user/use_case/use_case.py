@@ -110,7 +110,7 @@ class UserUseCase(UserInputPort):
             await uow.save_user(user=user)
             await uow.commit()
 
-    async def agree_terms(self,*, user_id: int, agree_marketing: bool, agree_push: bool):
+    async def agree_terms(self, *, user_id: int, agree_marketing: bool, agree_push: bool):
         async with self.user_store() as uow:
             user = await uow.get_user_by_user_id(user_id=user_id)
             if user is None:
@@ -163,6 +163,15 @@ class UserUseCase(UserInputPort):
             if not last_request:
                 raise NotFound("request not found")
             return last_request
+
+    async def change_user_face_verification(self, *, verification_request_id: int, status: FaceVerificationStatus):
+        async with self.user_store() as uow:
+            request = await uow.get_user_face_verification_request(verification_request_id=verification_request_id)
+            if not request:
+                raise NotFound("request not found")
+            request.change_status(status=status)
+            await uow.save_face_verification_request(face_verification_request=request)
+            await uow.commit()
 
     async def withdraw_user(self, *, user_id: int):
         # TODO: soft delete로 변경하거나 삭제된 데이터 별도 보관

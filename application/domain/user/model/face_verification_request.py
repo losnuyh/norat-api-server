@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import StrEnum, auto
 
 
@@ -17,3 +17,7 @@ class FaceVerificationRequest:
     requested_at: datetime
     changed_at: datetime
     id: int | None = None
+
+    def change_status(self, *, status: FaceVerificationStatus):
+        self.status = status
+        self.changed_at = datetime.now(tz=timezone.utc)

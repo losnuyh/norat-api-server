@@ -51,6 +51,12 @@ class UserStoreOutputPort(UnitOfWork, ABC):
         ...
 
     @abstractmethod
+    async def get_user_face_verification_request(
+        self, *, verification_request_id: int
+    ) -> FaceVerificationRequest | None:
+        ...
+
+    @abstractmethod
     async def delete_user(self, *, user: User):
         ...
 
