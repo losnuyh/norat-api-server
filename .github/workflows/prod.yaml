@@ -42,4 +42,4 @@ jobs:
 
       - name: Deploy admin function
         run: |
-          aws lambda update-function-code --function-name second_dev_admin_lambda --zip-file fileb://admin_api_lambda.zip
+          aws lambda update-function-code --function-name second_prod_admin_lambda --zip-file fileb://admin_api_lambda.zip
