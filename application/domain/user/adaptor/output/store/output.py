@@ -121,7 +121,14 @@ class UserStoreAdaptor(UserStoreOutputPort):
         stmt = (
             select(FaceVerificationRequestTable)
             .where(FaceVerificationRequestTable.user_id == user_id)
-            .where(FaceVerificationRequestTable.status != FaceVerificationStatus.REJECTED.value)
+            # .where(FaceVerificationRequestTable.status != FaceVerificationStatus.REJECTED.value)
+            .where(
+                FaceVerificationRequestTable.status.in_([
+                    FaceVerificationStatus.REJECTED.value,
+                    FaceVerificationStatus.ACCEPTED.value,
+                    FaceVerificationStatus.IN_PROGRESS.value
+                ])
+            )
             .order_by(-FaceVerificationRequestTable.id)
             .limit(1)
         )
