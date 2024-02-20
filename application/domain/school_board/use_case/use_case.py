@@ -25,7 +25,7 @@ class SchoolBoardUseCase(SchoolBoardInputPort):
         search_list = await self.school_search_output.search_school_by_name(keyword=keyword)
         if not search_list:
             return []
-        return search_list[:5]
+        return search_list[:10]
 
     async def register_school_member(self, *, school_code: str, user_id: int, grade: int):
         async with self.school_store_output as uow:
@@ -78,7 +78,7 @@ class SchoolBoardUseCase(SchoolBoardInputPort):
                 school_code=school_member.school_code,
                 grade=school_member.grade,
             )
-            if member_count < 20:  # TODO: 한번 열리면 닫히지 않게
+            if member_count < 15:  # TODO: 한번 열리면 닫히지 않게
                 raise SchoolBoardNotOpen("not open")
 
             school_member.set_queue_loader(loader=uow)
